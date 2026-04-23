@@ -1,0 +1,42 @@
+﻿@page "/test"
+@using EduConnect.Services.Interfaces
+@inject IAuthStateService AuthService
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h3>Auth Test Page</h3>
+        </div>
+        <div class="card-body">
+            <p><strong>IsAuthenticated:</strong> @AuthService.IsAuthenticated</p>
+            
+            @if (AuthService.CurrentUser != null)
+            {
+                <p><strong>User:</strong> @AuthService.CurrentUser.FullName</p>
+                <p><strong>Role:</strong> @AuthService.CurrentUser.GetRole()</p>
+            }
+            else
+            {
+                <p>No user logged in</p>
+            }
+            
+            <hr />
+            <button class="btn btn-primary" @onclick="TestLogin">Test Admin Login</button>
+            <button class="btn btn-danger" @onclick="TestLogout">Test Logout</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private async Task TestLogin()
+    {
+        await AuthService.LoginAsync("admin@educonnect.com", "admin123");
+        StateHasChanged();
+    }
+    
+    private void TestLogout()
+    {
+        AuthService.Logout();
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,52 @@
+{
+  "version": 2,
+  "dgSpecHash": "pmHIAbCnzpk=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\EduConnect.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\TALHA\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.6\\microsoft.aspnetcore.app.internal.assets.10.0.6.nupkg.sha512",
+    "C:\\Users\\TALHA\\.nuget\\packages\\microsoft.aspnetcore.components\\10.0.7\\microsoft.aspnetcore.components.10.0.7.nupkg.sha512",
+    "C:\\Users\\TALHA\\.nuget\\packages\\microsoft.aspnetcore.components.analyzers\\10.0.7\\microsoft.aspnetcore.components.analyzers.10.0.7.nupkg.sha512",
+    "C:\\Users\\TALHA\\.nuget\\packages\\microsoft.aspnetcore.components.forms\\10.0.7\\microsoft.aspnetcore.components.forms.10.0.7.nupkg.sha512",
+    "C:\\Users\\TALHA\\.nuget\\packages\\microsoft.aspnetcore.components.web\\10.0.7\\microsoft.aspnetcore.components.web.10.0.7.nupkg.sha512",
+    "C:\\Users\\TALHA\\.nuget\\packages\\system.componentmodel.annotations\\5.0.0\\system.componentmodel.annotations.5.0.0.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.AspNetCore.Components will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\EduConnect.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\EduConnect.csproj",
+      "libraryId": "Microsoft.AspNetCore.Components",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.AspNetCore.Components.Forms will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\EduConnect.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\EduConnect.csproj",
+      "libraryId": "Microsoft.AspNetCore.Components.Forms",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.AspNetCore.Components.Web will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\EduConnect.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\EduConnect.csproj",
+      "libraryId": "Microsoft.AspNetCore.Components.Web",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+wwwroot\app.css
+Components\Layout\ReconnectModal.razor.js
+C:\Users\TALHA\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.6\build\..\_framework\blazor.web.js
+C:\Users\TALHA\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.6\build\..\_framework\blazor.server.js
+C:\Users\TALHA\Desktop\EduConnect\EduConnect\wwwroot\app.css
+C:\Users\TALHA\Desktop\EduConnect\EduConnect\Components\Layout\ReconnectModal.razor.js
+C:\Users\TALHA\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.6\_framework\blazor.web.js
+C:\Users\TALHA\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.6\_framework\blazor.server.js

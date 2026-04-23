@@ -1,0 +1,165 @@
+﻿@page "/dashboard"
+@using EduConnect.Services.Interfaces
+@using EduConnect.Models
+@inject IAuthStateService AuthService
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<div class="container mt-4">
+
+    @if (CurrentUser == null)
+    {
+        <div class="alert alert-warning text-center">
+            <p>auth: @AuthService.IsAuthenticated</p>
+            <p>user: @AuthService.CurrentUser?.FullName</p>
+            <p>render time: @DateTime.Now</p>
+            <p>user: @AuthService.CurrentUser?.Email</p>
+            <h4>Please Login</h4>
+            <p>You need to be logged in to access your dashboard.</p>
+            <a href="/login" class="btn btn-primary">Go to Login</a>
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Dashboard</h4>
+            </div>
+
+            <div class="card-body">
+
+                <div class="alert alert-success">
+                    <p>auth: @AuthService.IsAuthenticated</p>
+                    <p>user: @AuthService.CurrentUser?.FullName</p>
+                    <h5>Welcome back, @CurrentUser.FullName!</h5>
+                    <p class="mb-0">You are logged in as <strong>@Role</strong></p>
+                </div>
+
+                <div class="row mt-4">
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+
+                                <h5 class="card-title">Your Information</h5>
+
+                                <table class="table table-sm">
+                                    <tr>
+                                        <th>Name:</th>
+                                        <td>@CurrentUser.FullName</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email:</th>
+                                        <td>@CurrentUser.Email</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Role:</th>
+                                        <td>@Role</td>
+                                    </tr>
+
+                                    @if (CurrentUser is Student student)
+                                    {
+                                        <tr>
+                                            <th>Semester:</th>
+                                            <td>@student.Semester</td>
+                                        </tr>
+                                        <tr>
+                                            <th>CGPA:</th>
+                                            <td>@student.CGPA.ToString("F2")</td>
+                                        </tr>
+                                    }
+
+                                    @if (CurrentUser is Faculty faculty)
+                                    {
+                                        <tr>
+                                            <th>Department:</th>
+                                            <td>@faculty.Department</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Designation:</th>
+                                            <td>@faculty.Designation</td>
+                                        </tr>
+                                    }
+
+                                    @if (CurrentUser is Admin admin)
+                                    {
+                                        <tr>
+                                            <th>Admin Level:</th>
+                                            <td>@admin.AdminLevel</td>
+                                        </tr>
+                                    }
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+
+                                <h5 class="card-title">Quick Actions</h5>
+
+                                <div class="d-grid gap-2">
+
+                                    @if (Role == "Admin")
+                                    {
+                                        <a href="/admin/students" class="btn btn-outline-primary">Manage Students</a>
+                                        <a href="/admin/courses" class="btn btn-outline-primary">Manage Courses</a>
+                                        <a href="/admin/reports" class="btn btn-outline-primary">View Reports</a>
+                                    }
+                                    else if (Role == "Faculty")
+                                    {
+                                        <a href="/faculty/courses" class="btn btn-outline-primary">My Courses</a>
+                                        <a href="/faculty/grades" class="btn btn-outline-primary">Submit Grades</a>
+                                    }
+                                    else if (Role == "Student")
+                                    {
+                                        <a href="/student/enroll" class="btn btn-outline-primary">Enroll in Courses</a>
+                                        <a href="/student/grades" class="btn btn-outline-primary">My Grades</a>
+                                    }
+
+                                    <a href="/notifications" class="btn btn-outline-secondary">Notifications</a>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    public Person? CurrentUser => AuthService.CurrentUser;
+    public string Role => CurrentUser?.GetRole() ?? "";
+
+    protected override void OnParametersSet()
+    {
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthService.OnLogin += OnAuthChanged;
+        AuthService.OnLogout += OnAuthChanged;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void OnAuthChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnLogin -= OnAuthChanged;
+        AuthService.OnLogout -= OnAuthChanged;
+    }
+}

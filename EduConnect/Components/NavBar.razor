@@ -1,0 +1,106 @@
+﻿@inject IAuthStateService AuthService
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">EduConnect</a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            @if (AuthService.IsAuthenticated && AuthService.CurrentUser != null)
+            {
+                var user = AuthService.CurrentUser;
+                var role = user.GetRole();
+                
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    
+                    @if (role == "Admin")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/students">Students</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/courses">Courses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/reports">Reports</a>
+                        </li>
+                    }
+                    else if (role == "Faculty")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/faculty/courses">My Courses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/faculty/grades">Submit Grades</a>
+                        </li>
+                    }
+                    else if (role == "Student")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/student/enroll">Enroll Courses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/student/grades">My Grades</a>
+                        </li>
+                    }
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/notifications">Notifications</a>
+                    </li>
+                </ul>
+                
+                <div class="navbar-nav ms-auto">
+                    <span class="navbar-text text-white me-3">
+                        Welcome, <strong>@user.FullName</strong>
+                        <span class="badge bg-info ms-1">@role</span>
+                    </span>
+                    <button class="btn btn-outline-light btn-sm" @onclick="Logout">Logout</button>
+                </div>
+            }
+            else
+            {
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                </ul>
+            }
+        </div>
+    </div>
+</nav>
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Subscribe to auth events
+        AuthService.OnLogin += OnAuthStateChanged;
+        AuthService.OnLogout += OnAuthStateChanged;
+    }
+    
+    private void OnAuthStateChanged()
+    {
+        // Force UI refresh
+        InvokeAsync(StateHasChanged);
+    }
+    
+    private async void Logout()
+    {
+        AuthService.Logout();
+        await Task.Delay(100);
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+    
+    public void Dispose()
+    {
+        AuthService.OnLogin -= OnAuthStateChanged;
+        AuthService.OnLogout -= OnAuthStateChanged;
+    }
+}
