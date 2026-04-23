@@ -4,7 +4,9 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">EduConnect</a>
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-mortarboard"></i> EduConnect
+        </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -17,59 +19,153 @@
                 var role = user.GetRole();
                 
                 <ul class="navbar-nav me-auto">
+                    <!-- Dashboard - Common for all roles -->
                     <li class="nav-item">
-                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                        <a class="nav-link" href="/dashboard">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
                     </li>
                     
+                    <!-- Course Catalog - Common for all authenticated roles -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/courses">
+                            <i class="bi bi-book"></i> Course Catalog
+                        </a>
+                    </li>
+                    
+                    <!-- Admin Menu Items -->
                     @if (role == "Admin")
                     {
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/students">Students</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/courses">Courses</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/reports">Reports</a>
-                        </li>
-                    }
-                    else if (role == "Faculty")
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" href="/faculty/courses">My Courses</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/faculty/grades">Submit Grades</a>
-                        </li>
-                    }
-                    else if (role == "Student")
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" href="/student/enroll">Enroll Courses</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/student/grades">My Grades</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-shield-lock"></i> Admin Panel
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="/admin/students">
+                                        <i class="bi bi-people"></i> Manage Students
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/courses">
+                                        <i class="bi bi-journal-bookmark-fill"></i> Manage Courses
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/reports/grades">
+                                        <i class="bi bi-graph-up"></i> Grade Reports
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/notifications">
+                                        <i class="bi bi-bell"></i> Broadcast Message
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     }
                     
+                    <!-- Faculty Menu Items -->
+                    @if (role == "Faculty")
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="facultyDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-easel"></i> Faculty Panel
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="/faculty/courses">
+                                        <i class="bi bi-collection"></i> My Courses
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/faculty/grades">
+                                        <i class="bi bi-pencil-square"></i> Submit Grades
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    
+                    <!-- Student Menu Items -->
+                    @if (role == "Student")
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="studentDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-backpack"></i> Student Panel
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="/student/enroll">
+                                        <i class="bi bi-plus-circle"></i> Enroll Courses
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/student/grades">
+                                        <i class="bi bi-trophy"></i> My Grades
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    
+                    <!-- Notifications - Common for all authenticated roles -->
                     <li class="nav-item">
-                        <a class="nav-link" href="/notifications">Notifications</a>
+                        <a class="nav-link" href="/notifications">
+                            <i class="bi bi-bell"></i> Notifications
+                            @if (unreadCount > 0)
+                            {
+                                <span class="badge bg-danger rounded-pill">@unreadCount</span>
+                            }
+                        </a>
                     </li>
                 </ul>
                 
+                <!-- User Info and Logout -->
                 <div class="navbar-nav ms-auto">
-                    <span class="navbar-text text-white me-3">
-                        Welcome, <strong>@user.FullName</strong>
-                        <span class="badge bg-info ms-1">@role</span>
-                    </span>
-                    <button class="btn btn-outline-light btn-sm" @onclick="Logout">Logout</button>
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> @user.FullName
+                            <span class="badge bg-info ms-1">@role</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="/dashboard">
+                                    <i class="bi bi-person-badge"></i> My Profile
+                                </a>
+                            </li>
+                            @if (role == "Student")
+                            {
+                                <li>
+                                    <a class="dropdown-item" href="/student/grades">
+                                        <i class="bi bi-graph-up"></i> My Grades
+                                    </a>
+                                </li>
+                            }
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <button class="dropdown-item text-danger" @onclick="Logout">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             }
             else
             {
+                <!-- Not Logged In Menu -->
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
+                        <a class="nav-link" href="/courses">
+                            <i class="bi bi-book"></i> Course Catalog
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-light btn-sm px-3" href="/login">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
                     </li>
                 </ul>
             }
@@ -77,25 +173,89 @@
     </div>
 </nav>
 
+<style>
+    .navbar-nav .nav-link {
+        color: rgba(255,255,255,0.9) !important;
+        transition: all 0.3s ease;
+    }
+    
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+            transform: translateY(-1px);
+        }
+    
+    .dropdown-menu {
+        margin-top: 0.5rem;
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .dropdown-item {
+        transition: all 0.2s ease;
+    }
+    
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+    
+    @@media (max-width: 768px) {
+        .navbar-nav .nav-link {
+            padding: 0.5rem 1rem;
+        }
+        
+        .dropdown-menu {
+            background-color: #f8f9fa;
+            border: none;
+        }
+    }
+</style>
+
 @code {
+    private int unreadCount = 0;
+    
     protected override void OnInitialized()
     {
         // Subscribe to auth events
         AuthService.OnLogin += OnAuthStateChanged;
         AuthService.OnLogout += OnAuthStateChanged;
+        
+        // Load unread notifications count (for Module 5)
+        LoadUnreadCount();
     }
     
     private void OnAuthStateChanged()
     {
         // Force UI refresh
         InvokeAsync(StateHasChanged);
+        
+        // Reload notifications count when user logs in
+        if (AuthService.IsAuthenticated)
+        {
+            LoadUnreadCount();
+        }
+    }
+    
+    private void LoadUnreadCount()
+    {
+        // This will be implemented in Module 5 (Notification System)
+        // For now, just set to 0
+        unreadCount = 0;
     }
     
     private async void Logout()
     {
-        AuthService.Logout();
-        await Task.Delay(100);
-        Navigation.NavigateTo("/login", forceLoad: true);
+        try
+        {
+            AuthService.Logout();
+            await Task.Delay(100);
+            Navigation.NavigateTo("/login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Logout error: {ex.Message}");
+            Navigation.NavigateTo("/login", forceLoad: true);
+        }
     }
     
     public void Dispose()

@@ -1,0 +1,82 @@
+﻿@page "/courses"
+@using EduConnect.Services.Interfaces
+@using EduConnect.Models
+@inject ICourseService CourseService
+@inject IAuthStateService AuthStateService
+
+<div class="container mt-4">
+    <h2 class="mb-4">Course Catalog</h2>
+    
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var course in courses)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">@course.Code - @course.Title</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                <strong>Credits:</strong> @course.CreditHours<br />
+                                <strong>Instructor:</strong> @course.Instructor<br />
+                                <strong>Available Seats:</strong> @course.AvailableSeats / @course.MaxCapacity<br />
+                                <strong>Status:</strong>
+                                <span class="badge @GetStatusBadgeClass(course.EnrollmentStatus)">
+                                    @course.EnrollmentStatus
+                                </span>
+                            </p>
+                            <div class="progress mb-2">
+                                <div class="progress-bar @GetProgressBarClass(course.GetEnrollmentPercentage())"
+                                     style="width: @course.GetEnrollmentPercentage()%">
+                                    @course.GetEnrollmentPercentage().ToString("F0")%
+                                </div>
+                            </div>
+                            <p class="small text-muted mt-2">@course.Description</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<Course> courses = new();
+    private bool isLoading = true;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        courses = await CourseService.GetAllCoursesAsync();
+        isLoading = false;
+        StateHasChanged();
+    }
+    
+    private string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Open" => "bg-success",
+            "Almost Full" => "bg-warning",
+            "Full" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+    
+    private string GetProgressBarClass(double percentage)
+    {
+        if (percentage >= 90) return "bg-danger";
+        if (percentage >= 70) return "bg-warning";
+        return "bg-success";
+    }
+}

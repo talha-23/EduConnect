@@ -30,12 +30,40 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xOYXZCYXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/AddStudent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYWdlXEFkZFN0dWRlbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/Courses.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYWdlXENvdXJzZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/EditStudent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYWdlXEVkaXRTdHVkZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/StudentDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYWdlXFN0dWRlbnREZXRhaWxzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/Students.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYWdlXFN0dWRlbnRzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/Courses.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291cnNlcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/Dashboard.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/StudentPage/Enroll.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3R1ZGVudFBhZ2VcRW5yb2xsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/TestAuth.razor]

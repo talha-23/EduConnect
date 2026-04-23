@@ -1,0 +1,258 @@
+﻿@page "/student/enroll"
+@using EduConnect.Services.Interfaces
+@attribute [Authorize(Roles = "Student")]
+@using Microsoft.AspNetCore.Authorization
+@using EduConnect.Models
+@inject IEnrollmentService EnrollmentService
+@inject ICourseService CourseService
+@inject IAuthStateService AuthStateService
+@inject NavigationManager Navigation
+
+<div class="container mt-4">
+    <h2>Course Enrollment</h2>
+    
+    @if (showSuccess)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    @if (showError)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @errorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Available Courses</h5>
+                </div>
+                <div class="card-body">
+                    @if (isLoading)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                    else if (!availableCourses.Any())
+                    {
+                        <div class="alert alert-info">
+                            No courses available for enrollment at this time.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Course Code</th>
+                                        <th>Course Title</th>
+                                        <th>Credits</th>
+                                        <th>Available Seats</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var course in availableCourses)
+                                    {
+                                        <tr>
+                                            <td>@course.Code</td>
+                                            <td>@course.Title</td>
+                                            <td>@course.CreditHours</td>
+                                            <td>
+                                                <span class="badge @(course.AvailableSeats > 0 ? "bg-success" : "bg-danger")">
+                                                    @course.AvailableSeats / @course.MaxCapacity
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary"
+                                                        @onclick="() => EnrollInCourse(course.Id)"
+                                                        disabled="@(course.IsFull || isProcessing)">
+                                                    <i class="bi bi-plus-circle"></i> Enroll
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">My Enrolled Courses</h5>
+                </div>
+                <div class="card-body">
+                    @if (isLoadingEnrolled)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border spinner-border-sm text-primary"></div>
+                        </div>
+                    }
+                    else if (!enrolledCourses.Any())
+                    {
+                        <div class="alert alert-info">
+                            You are not enrolled in any courses yet.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var course in enrolledCourses)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>@course.Code</strong><br />
+                                            <small>@course.Title</small><br />
+                                            <small class="text-muted">@course.CreditHours credits</small>
+                                        </div>
+                                        <button class="btn btn-sm btn-danger"
+                                                @onclick="() => DropCourse(course.Id)"
+                                                disabled="@isProcessing">
+                                            <i class="bi bi-x-circle"></i> Drop
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="mt-3 alert alert-info">
+                            <strong>Total Credits:</strong> @totalCredits
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Course> availableCourses = new();
+    private List<Course> enrolledCourses = new();
+    private bool isLoading = true;
+    private bool isLoadingEnrolled = true;
+    private bool isProcessing = false;
+    private int totalCredits = 0;
+    private string successMessage = string.Empty;
+    private bool showSuccess = false;
+    private string errorMessage = string.Empty;
+    private bool showError = false;
+    
+    private Guid? currentStudentId => AuthStateService.CurrentUser?.Id;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    
+    private async Task LoadData()
+    {
+        if (currentStudentId == null) return;
+        
+        isLoading = true;
+        isLoadingEnrolled = true;
+        
+        availableCourses = await EnrollmentService.GetAvailableCoursesForStudentAsync(currentStudentId.Value);
+        enrolledCourses = await EnrollmentService.GetStudentEnrolledCoursesAsync(currentStudentId.Value);
+        totalCredits = await EnrollmentService.GetStudentTotalCreditsAsync(currentStudentId.Value);
+        
+        isLoading = false;
+        isLoadingEnrolled = false;
+        StateHasChanged();
+    }
+    
+    private async Task EnrollInCourse(Guid courseId)
+    {
+        if (currentStudentId == null) return;
+        
+        isProcessing = true;
+        showError = false;
+        showSuccess = false;
+        
+        try
+        {
+            var success = await EnrollmentService.EnrollStudentAsync(currentStudentId.Value, courseId);
+            if (success)
+            {
+                successMessage = "Successfully enrolled in the course!";
+                showSuccess = true;
+                await LoadData();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            showError = true;
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+            
+            // Auto-hide messages after 3 seconds
+            await Task.Delay(3000);
+            showSuccess = false;
+            showError = false;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task DropCourse(Guid courseId)
+    {
+        if (currentStudentId == null) return;
+        
+        var confirmed = await ShowConfirmDialog("Are you sure you want to drop this course?", "Confirm Drop");
+        if (!confirmed) return;
+        
+        isProcessing = true;
+        showError = false;
+        showSuccess = false;
+        
+        try
+        {
+            var success = await EnrollmentService.DropCourseAsync(currentStudentId.Value, courseId);
+            if (success)
+            {
+                successMessage = "Successfully dropped the course!";
+                showSuccess = true;
+                await LoadData();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            showError = true;
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+            
+            await Task.Delay(3000);
+            showSuccess = false;
+            showError = false;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task<bool> ShowConfirmDialog(string message, string title)
+    {
+        return await JSRuntime.InvokeAsync<bool>("showConfirm", message, title);
+    }
+    
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = default!;
+}

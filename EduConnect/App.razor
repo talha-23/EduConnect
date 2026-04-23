@@ -1,11 +1,28 @@
-﻿<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly">
-        <Found Context="routeData">
-            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        </Found>
+﻿@using EduConnect.Shared
 
-        <NotFound>
-            <RedirectToLogin />
-        </NotFound>
-    </Router>
-</CascadingAuthenticationState>
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        @* <FocusOnNavigate RouteData="@routeData" Selector="h1" /> *@
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea, #764ba2); padding: 20px;">
+                <div style="text-align: center; background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 100%;">
+        
+                    <h2>WELCOME TO EDUCONNECT</h2>
+        
+                    <p>
+                        Educonnect is your university academic portal where you can access courses,
+                        grades, and student services in one place. please log in to continue.
+                    </p>
+
+                    <a href="/login" class="btn btn-primary" style="margin-top: 15px;">
+                        LOG IN
+                    </a>
+
+                </div>
+            </div>
+        </LayoutView>
+    </NotFound>
+</Router>

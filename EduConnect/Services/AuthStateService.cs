@@ -29,7 +29,7 @@ namespace EduConnect.Services
             _users.Add(new Admin
             {
                 Id = Guid.NewGuid(),
-                FullName = "Admin User",
+                FullName = "MUHAMMAD TALHA",
                 Email = "admin@educonnect.com",
                 Password = "admin123",
                 AdminLevel = "Super Admin"
@@ -38,7 +38,7 @@ namespace EduConnect.Services
             _users.Add(new Faculty
             {
                 Id = Guid.NewGuid(),
-                FullName = "Dr. Sarah Johnson",
+                FullName = "INSHA KHAN",
                 Email = "faculty@educonnect.com",
                 Password = "faculty123",
                 Department = "Computer Science",
@@ -48,7 +48,7 @@ namespace EduConnect.Services
             _users.Add(new Student
             {
                 Id = Guid.NewGuid(),
-                FullName = "John Doe",
+                FullName = "ABDUL MOEEZ RAZA KAZMI",
                 Email = "student@educonnect.com",
                 Password = "student123",
                 Semester = 3,

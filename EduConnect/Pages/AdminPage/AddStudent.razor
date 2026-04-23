@@ -1,0 +1,138 @@
+﻿@page "/admin/students/add"
+@attribute [Authorize(Roles = "Admin")]
+@using Microsoft.AspNetCore.Authorization
+@using EduConnect.Services.Interfaces
+@using EduConnect.Models
+@inject IStudentService StudentService
+@inject NavigationManager Navigation
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Add New Student</h4>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger">@errorMessage</div>
+                    }
+                    
+                    <form @onsubmit="HandleSubmit">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" @bind="student.FullName" required />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Student ID *</label>
+                            <input type="text" class="form-control" @bind="student.StudentId" required />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" @bind="student.Email" required />
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Semester *</label>
+                                <select class="form-select" @bind="student.Semester">
+                                    <option value="">Select Semester</option>
+                                    @for (int i = 1; i <= 8; i++)
+                                    {
+                                        <option value="@i">Semester @i</option>
+                                    }
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">CGPA *</label>
+                                <input type="number" step="0.01" min="0" max="4" class="form-control" @bind="student.CGPA" required />
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Department *</label>
+                            <select class="form-select" @bind="student.Department">
+                                <option value="">Select Department</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Software Engineering">Software Engineering</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Data Science">Data Science</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                                @if (isSubmitting)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                Create Student
+                            </button>
+                            <a href="/admin/students" class="btn btn-secondary ms-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Student student = new();
+    private bool isSubmitting = false;
+    private string errorMessage = string.Empty;
+    
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = string.Empty;
+        
+        try
+        {
+            // Validate
+            if (string.IsNullOrWhiteSpace(student.FullName))
+                throw new Exception("Full name is required");
+            
+            if (string.IsNullOrWhiteSpace(student.StudentId))
+                throw new Exception("Student ID is required");
+            
+            if (string.IsNullOrWhiteSpace(student.Email))
+                throw new Exception("Email is required");
+            
+            if (student.Semester < 1 || student.Semester > 8)
+                throw new Exception("Valid semester is required (1-8)");
+            
+            if (student.CGPA < 0 || student.CGPA > 4)
+                throw new Exception("CGPA must be between 0 and 4");
+            
+            // Check if email already exists
+            var existing = await StudentService.GetStudentByEmailAsync(student.Email);
+            if (existing != null)
+                throw new Exception("A student with this email already exists");
+            
+            var newStudent = await StudentService.AddStudentAsync(student);
+            await ShowAlert("Student created successfully!", "success");
+            Navigation.NavigateTo("/admin/students");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+    
+    private async Task ShowAlert(string message, string type)
+    {
+        await JSRuntime.InvokeVoidAsync("showToast", message, type);
+    }
+    
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = default!;
+}

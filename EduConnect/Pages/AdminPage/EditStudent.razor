@@ -1,0 +1,134 @@
+﻿@page "/admin/students/edit/{Id:guid}"
+@attribute [Authorize(Roles = "Admin")]
+@using Microsoft.AspNetCore.Authorization
+@using EduConnect.Services.Interfaces
+@using EduConnect.Models
+@inject IStudentService StudentService
+@inject NavigationManager Navigation
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h4 class="mb-0">Edit Student</h4>
+                </div>
+                <div class="card-body">
+                    @if (student == null)
+                    {
+                        <div class="alert alert-danger">Student not found!</div>
+                    }
+                    else
+                    {
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger">@errorMessage</div>
+                        }
+                        
+                        <form @onsubmit="HandleSubmit">
+                            <div class="mb-3">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" @bind="student.FullName" required />
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Student ID *</label>
+                                <input type="text" class="form-control" @bind="student.StudentId" required />
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" @bind="student.Email" required />
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Semester *</label>
+                                    <select class="form-select" @bind="student.Semester">
+                                        @for (int i = 1; i <= 8; i++)
+                                        {
+                                            <option value="@i">Semester @i</option>
+                                        }
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">CGPA *</label>
+                                    <input type="number" step="0.01" min="0" max="4" class="form-control" @bind="student.CGPA" required />
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Department *</label>
+                                <select class="form-select" @bind="student.Department">
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="Software Engineering">Software Engineering</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Data Science">Data Science</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                                    @if (isSubmitting)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                    }
+                                    Update Student
+                                </button>
+                                <a href="/admin/students" class="btn btn-secondary ms-2">Cancel</a>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private Student? student;
+    private bool isSubmitting = false;
+    private string errorMessage = string.Empty;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        student = await StudentService.GetStudentByIdAsync(Id);
+        if (student == null)
+        {
+            errorMessage = "Student not found!";
+        }
+    }
+    
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = string.Empty;
+        
+        try
+        {
+            if (student == null) throw new Exception("Student not found");
+            
+            await StudentService.UpdateStudentAsync(student);
+            await ShowAlert("Student updated successfully!", "success");
+            Navigation.NavigateTo("/admin/students");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+    
+    private async Task ShowAlert(string message, string type)
+    {
+        await JSRuntime.InvokeVoidAsync("showToast", message, type);
+    }
+    
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = default!;
+}

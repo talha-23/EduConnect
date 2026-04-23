@@ -1,0 +1,132 @@
+﻿@page "/admin/students/{Id:guid}"
+@attribute [Authorize(Roles = "Admin")]
+@using Microsoft.AspNetCore.Authorization 
+@using EduConnect.Services.Interfaces
+@using EduConnect.Models
+@inject IStudentService StudentService
+@inject IEnrollmentService EnrollmentService
+@inject NavigationManager Navigation
+
+<div class="container mt-4">
+    @if (student == null)
+    {
+        <div class="alert alert-danger">Student not found!</div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">Student Details: @student.FullName</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Personal Information</h5>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Student ID</th>
+                                <td>@student.StudentId</td>
+                            </tr>
+                            <tr>
+                                <th>Full Name</th>
+                                <td>@student.FullName</td>
+                            </tr>
+                            <tr>
+                                <th>Email</th>
+                                <td>@student.Email</td>
+                            </tr>
+                            <tr>
+                                <th>Semester</th>
+                                <td>Semester @student.Semester</td>
+                            </tr>
+                            <tr>
+                                <th>CGPA</th>
+                                <td>
+                                    <span class="badge @GetCgpaBadgeClass(student.CGPA)" style="font-size: 1rem;">
+                                        @student.CGPA.ToString("F2")
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Department</th>
+                                <td>@student.Department</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>Enrolled Courses (@enrolledCourses.Count)</h5>
+                        @if (!enrolledCourses.Any())
+                        {
+                            <div class="alert alert-info">No courses enrolled yet.</div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Course Code</th>
+                                            <th>Course Title</th>
+                                            <th>Credits</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var course in enrolledCourses)
+                                        {
+                                            <tr>
+                                                <td>@course.Code</td>
+                                                <td>@course.Title</td>
+                                                <td>@course.CreditHours</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="table-info">
+                                            <td colspan="2"><strong>Total Credits:</strong></td>
+                                            <td><strong>@totalCredits</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <a href="/admin/students" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                    <a href="/admin/students/edit/@student.Id" class="btn btn-warning ms-2">
+                        <i class="bi bi-pencil"></i> Edit Student
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private Student? student;
+    private List<Course> enrolledCourses = new();
+    private int totalCredits = 0;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        student = await StudentService.GetStudentByIdAsync(Id);
+        if (student != null)
+        {
+            enrolledCourses = await EnrollmentService.GetStudentEnrolledCoursesAsync(Id);
+            totalCredits = await EnrollmentService.GetStudentTotalCreditsAsync(Id);
+        }
+    }
+    
+    private string GetCgpaBadgeClass(double cgpa)
+    {
+        if (cgpa >= 3.5) return "bg-success";
+        if (cgpa >= 3.0) return "bg-info";
+        if (cgpa >= 2.5) return "bg-warning";
+        return "bg-danger";
+    }
+}
