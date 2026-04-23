@@ -26,7 +26,7 @@ namespace EduConnect.Services
                 CreditHours = 3,
                 MaxCapacity = 30,
                 Description = "Basic programming concepts using C#",
-                Instructor = "Dr. Smith"
+                Instructor = "Dr. Chohan"
             });
 
             _courses.Add(new Course
@@ -37,7 +37,7 @@ namespace EduConnect.Services
                 CreditHours = 3,
                 MaxCapacity = 25,
                 Description = "Advanced data structures and algorithms",
-                Instructor = "Dr. Johnson"
+                Instructor = "Dr. Farooq"
             });
 
             _courses.Add(new Course
@@ -48,7 +48,7 @@ namespace EduConnect.Services
                 CreditHours = 3,
                 MaxCapacity = 30,
                 Description = "Database design and SQL",
-                Instructor = "Prof. Williams"
+                Instructor = "Prof. irfan"
             });
 
             _courses.Add(new Course
@@ -59,7 +59,7 @@ namespace EduConnect.Services
                 CreditHours = 3,
                 MaxCapacity = 28,
                 Description = "Modern web development with Blazor",
-                Instructor = "Dr. Brown"
+                Instructor = "Dr. Rashid"
             });
         }
 

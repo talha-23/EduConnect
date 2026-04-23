@@ -21,8 +21,8 @@ namespace EduConnect.Services
             _students.Add(new Student
             {
                 Id = Guid.NewGuid(),
-                FullName = "Alice Johnson",
-                Email = "alice@educonnect.com",
+                FullName = "BABER AZAM",
+                Email = "baber@educonnect.com",
                 Password = "password123",
                 StudentId = "STU001",
                 Semester = 3,
@@ -33,8 +33,8 @@ namespace EduConnect.Services
             _students.Add(new Student
             {
                 Id = Guid.NewGuid(),
-                FullName = "Bob Smith",
-                Email = "bob@educonnect.com",
+                FullName = "ALLAH DITA",
+                Email = "dita@educonnect.com",
                 Password = "password123",
                 StudentId = "STU002",
                 Semester = 2,
@@ -45,8 +45,8 @@ namespace EduConnect.Services
             _students.Add(new Student
             {
                 Id = Guid.NewGuid(),
-                FullName = "Carol Davis",
-                Email = "carol@educonnect.com",
+                FullName = "MIA ASLAM",
+                Email = "aslam@educonnect.com",
                 Password = "password123",
                 StudentId = "STU003",
                 Semester = 5,
