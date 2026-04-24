@@ -1,0 +1,349 @@
+﻿@page "/student/grades"
+@attribute [Authorize(Roles = "Student")]
+@using Microsoft.AspNetCore.Authorization
+@using EduConnect.Models
+@using EduConnect.Services.Interfaces
+@implements IDisposable
+
+<div class="container mt-4">
+    <h2 class="mb-4">My Grades</h2>
+    
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- CGPA Summary Card -->
+        <div class="card mb-4 bg-gradient">
+            <div class="card-body text-center">
+                <h5 class="card-title">Current CGPA</h5>
+                <div class="display-1 @GetCgpaColorClass(currentCgpa)">
+                    @currentCgpa.ToString("F2")
+                </div>
+                <p class="text-muted">out of 4.00</p>
+                <div class="row mt-3">
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted">Total Credits</small>
+                            <h4>@totalCredits</h4>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted">Courses Taken</small>
+                            <h4>@enrolledCourses.Count</h4>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-2">
+                            <small class="text-muted">Graded Courses</small>
+                            <h4>@gradedCount</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Grades Table -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Course Grades</h5>
+            </div>
+            <div class="card-body">
+                @if (!enrolledCourses.Any())
+                {
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> You are not enrolled in any courses yet.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Course Code</th>
+                                    <th>Course Title</th>
+                                    <th>Credits</th>
+                                    <th>Marks</th>
+                                    <th>Letter Grade</th>
+                                    <th>Grade Points</th>
+                                    <th>Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in courseGradeViewModels)
+                                {
+                                    <tr class="@(item.HasGrade ? item.GetCssClass() : "")">
+                                        <td>@item.CourseCode</td>
+                                        <td>@item.CourseTitle</td>
+                                        <td>@item.CreditHours</td>
+                                        <td>
+                                            @if (item.HasGrade)
+                                            {
+                                                <span>@item.Marks.ToString("F0")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Not graded</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.HasGrade)
+                                            {
+                                                <span class="badge @GetGradeBadgeClass(item.LetterGrade)" style="font-size: 1rem;">
+                                                    @item.LetterGrade
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Pending</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.HasGrade)
+                                            {
+                                                <span>@item.GradePoints.ToString("F2")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.HasGrade)
+                                            {
+                                                if (item.LetterGrade == "F")
+                                                {
+                                                    <span class="badge bg-danger">Failed</span>
+                                                }
+                                                else if (item.LetterGrade == "A")
+                                                {
+                                                    <span class="badge bg-success">Excellent</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-info">Passed</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">In Progress</span>
+                                            }
+                                        </td>
+                                        <td>@(item.HasGrade ? item.Remarks : "-")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            @if (gradedCount > 0)
+                            {
+                                <tfoot class="table-secondary">
+                                    <tr>
+                                        <td colspan="2"><strong>Total</strong></td>
+                                        <td><strong>@totalCredits</strong></td>
+                                        <td colspan="2"><strong>Weighted GPA:</strong></td>
+                                        <td colspan="3"><strong>@currentCgpa.ToString("F2")</strong></td>
+                                    </tr>
+                                </tfoot>
+                            }
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+        
+        <!-- Grade Scale Legend -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6>Grade Scale:</h6>
+                <div class="row g-2">
+                    <div class="col-md-2">
+                        <span class="badge bg-success">A (85-100)</span> = 4.0
+                    </div>
+                    <div class="col-md-2">
+                        <span class="badge bg-info">B (70-84)</span> = 3.0
+                    </div>
+                    <div class="col-md-2">
+                        <span class="badge bg-warning">C (55-69)</span> = 2.0
+                    </div>
+                    <div class="col-md-2">
+                        <span class="badge bg-secondary">D (45-54)</span> = 1.0
+                    </div>
+                    <div class="col-md-2">
+                        <span class="badge bg-danger">F (Below 45)</span> = 0.0
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Academic Standing -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6>Academic Standing:</h6>
+                @if (currentCgpa >= 3.5)
+                {
+                    <div class="alert alert-success">
+                        <i class="bi bi-trophy"></i> <strong>Dean's List!</strong> Excellent academic performance!
+                    </div>
+                }
+                else if (currentCgpa >= 3.0)
+                {
+                    <div class="alert alert-info">
+                        <i class="bi bi-star"></i> <strong>Good Standing.</strong> Keep up the good work!
+                    </div>
+                }
+                else if (currentCgpa >= 2.0)
+                {
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> <strong>Satisfactory.</strong> You need to improve your grades.
+                    </div>
+                }
+                else if (currentCgpa > 0)
+                {
+                    <div class="alert alert-danger">
+                        <i class="bi bi-emoji-frown"></i> <strong>Academic Probation.</strong> Please consult your academic advisor.
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Course> enrolledCourses = new();
+    private List<CourseGradeViewModel> courseGradeViewModels = new();
+    private bool isLoading = true;
+    private double currentCgpa = 0;
+    private int totalCredits = 0;
+    private int gradedCount = 0;
+    private Guid? currentStudentId => AuthStateService.CurrentUser?.Id;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+        
+        // Subscribe to grade submission events for real-time updates
+        if (GradeService != null)
+        {
+            GradeService.OnGradeSubmitted += OnGradeSubmitted;
+        }
+    }
+    
+    private async Task LoadData()
+    {
+        if (currentStudentId == null) return;
+        
+        isLoading = true;
+        
+        try
+        {
+            // Load courses and basic info
+            enrolledCourses = await EnrollmentService.GetStudentEnrolledCoursesAsync(currentStudentId.Value);
+            totalCredits = await EnrollmentService.GetStudentTotalCreditsAsync(currentStudentId.Value);
+            currentCgpa = await GradeService.CalculateStudentCGPAAsync(currentStudentId.Value);
+            
+            // Load grades for each course and build view model
+            courseGradeViewModels.Clear();
+            gradedCount = 0;
+            
+            foreach (var course in enrolledCourses)
+            {
+                var grade = await GradeService.GetGradeByStudentAndCourseAsync(currentStudentId.Value, course.Id);
+                var hasGrade = grade != null && grade.Marks > 0;
+                
+                if (hasGrade) gradedCount++;
+                
+                courseGradeViewModels.Add(new CourseGradeViewModel
+                {
+                    CourseId = course.Id,
+                    CourseCode = course.Code,
+                    CourseTitle = course.Title,
+                    CreditHours = course.CreditHours,
+                    HasGrade = hasGrade,
+                    Marks = hasGrade ? grade!.Marks : 0,
+                    LetterGrade = hasGrade ? grade!.LetterGrade : "",
+                    GradePoints = hasGrade ? grade!.GradePoints : 0,
+                    Remarks = hasGrade ? grade!.Remarks : "",
+                    GetCssClass = () => hasGrade ? grade!.GetCssClass() : ""
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle error appropriately
+            Console.WriteLine($"Error loading grades: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+    
+    private async void OnGradeSubmitted(GradeRecord grade)
+    {
+        if (grade.StudentId == currentStudentId)
+        {
+            await LoadData();
+        }
+    }
+    
+    private string GetCgpaColorClass(double cgpa)
+    {
+        if (cgpa >= 3.5) return "text-success";
+        if (cgpa >= 3.0) return "text-info";
+        if (cgpa >= 2.5) return "text-warning";
+        return "text-danger";
+    }
+    
+    private string GetGradeBadgeClass(string grade)
+    {
+        return grade switch
+        {
+            "A" => "bg-success",
+            "B" => "bg-info",
+            "C" => "bg-warning",
+            "D" => "bg-secondary",
+            "F" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+    
+    public void Dispose()
+    {
+        if (GradeService != null)
+        {
+            GradeService.OnGradeSubmitted -= OnGradeSubmitted;
+        }
+    }
+    
+    [Inject]
+    private IEnrollmentService EnrollmentService { get; set; } = default!;
+    
+    [Inject]
+    private IGradeService GradeService { get; set; } = default!;
+    
+    [Inject]
+    private IAuthStateService AuthStateService { get; set; } = default!;
+    
+    // ViewModel class to hold course and grade data together
+    private class CourseGradeViewModel
+    {
+        public Guid CourseId { get; set; }
+        public string CourseCode { get; set; } = string.Empty;
+        public string CourseTitle { get; set; } = string.Empty;
+        public int CreditHours { get; set; }
+        public bool HasGrade { get; set; }
+        public double Marks { get; set; }
+        public string LetterGrade { get; set; } = string.Empty;
+        public double GradePoints { get; set; }
+        public string Remarks { get; set; } = string.Empty;
+        public Func<string> GetCssClass { get; set; } = () => "";
+    }
+}

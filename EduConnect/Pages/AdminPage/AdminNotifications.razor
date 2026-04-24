@@ -1,0 +1,265 @@
+﻿@page "/admin/notifications"
+@attribute [Authorize(Roles = "Admin")]
+@using Microsoft.AspNetCore.Authorization
+@using EduConnect.Services.Interfaces
+@using EduConnect.Models
+@inject INotificationService NotificationService
+@inject IStudentService StudentService
+@inject IAuthStateService AuthStateService
+@inject NavigationManager Navigation
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-megaphone"></i> Broadcast Announcement
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i> @errorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(successMessage))
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle"></i> @successMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Announcement Title</label>
+                        <input type="text" class="form-control" @bind="notificationTitle"
+                               placeholder="e.g., Semester Break Announcement" />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control" rows="5" @bind="notificationMessage"
+                                  placeholder="Enter your announcement message here..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Send To</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="checkbox" class="btn-check" id="btnAdmin" @bind="sendToAdmin">
+                            <label class="btn btn-outline-primary" for="btnAdmin">
+                                <i class="bi bi-shield-lock"></i> Admin
+                            </label>
+                            
+                            <input type="checkbox" class="btn-check" id="btnFaculty" @bind="sendToFaculty">
+                            <label class="btn btn-outline-primary" for="btnFaculty">
+                                <i class="bi bi-easel"></i> Faculty
+                            </label>
+                            
+                            <input type="checkbox" class="btn-check" id="btnStudent" @bind="sendToStudent">
+                            <label class="btn btn-outline-primary" for="btnStudent">
+                                <i class="bi bi-people"></i> Students
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select class="form-select" @bind="priority">
+                            <option value="info">📘 Information (Blue)</option>
+                            <option value="success">✅ Success (Green)</option>
+                            <option value="warning">⚠️ Warning (Yellow)</option>
+                            <option value="danger">🔴 Urgent (Red)</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary w-100" @onclick="SendBroadcast" disabled="@isSending">
+                        @if (isSending)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            <span>Sending Broadcast...</span>
+                        }
+                        else
+                        {
+                            <span><i class="bi bi-megaphone"></i> Send Broadcast</span>
+                        }
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Sample Broadcasts Preview -->
+            <div class="card mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Announcements</h5>
+                </div>
+                <div class="card-body">
+                    @if (recentNotifications.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var notification in recentNotifications.Take(5))
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong class="text-primary">@notification.Title</strong>
+                                            <p class="mb-1 small">@notification.Message</p>
+                                            <small class="text-muted">
+                                                <i class="bi bi-clock"></i> @notification.TimeAgo
+                                                <span class="ms-2">
+                                                    <i class="bi bi-tag"></i> Sent to: @(string.IsNullOrEmpty(notification.UserRole) ? "Specific User" : notification.UserRole)
+                                                </span>
+                                            </small>
+                                        </div>
+                                        <span class="badge @notification.GetPriorityClass()">@notification.Priority</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted">
+                            <i class="bi bi-inbox fs-1"></i>
+                            <p>No recent announcements</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string notificationTitle = "";
+    private string notificationMessage = "";
+    private bool sendToAdmin = false;
+    private bool sendToFaculty = false;
+    private bool sendToStudent = true;
+    private string priority = "info";
+    private bool isSending = false;
+    private string errorMessage = "";
+    private string successMessage = "";
+    private List<Notification> recentNotifications = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRecentNotifications();
+    }
+    
+    private async Task LoadRecentNotifications()
+    {
+        try
+        {
+            recentNotifications = await NotificationService.GetRoleNotificationsAsync("All");
+            var adminNotes = await NotificationService.GetRoleNotificationsAsync("Admin");
+            recentNotifications.AddRange(adminNotes);
+            recentNotifications = recentNotifications.OrderByDescending(n => n.CreatedAt).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading notifications: {ex.Message}");
+        }
+        StateHasChanged();
+    }
+    
+    private async Task SendBroadcast()
+    {
+        // Reset messages
+        errorMessage = "";
+        successMessage = "";
+        
+        // Validate inputs
+        if (string.IsNullOrWhiteSpace(notificationTitle))
+        {
+            errorMessage = "Please enter an announcement title";
+            StateHasChanged();
+            await Task.Delay(3000);
+            errorMessage = "";
+            StateHasChanged();
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(notificationMessage))
+        {
+            errorMessage = "Please enter an announcement message";
+            StateHasChanged();
+            await Task.Delay(3000);
+            errorMessage = "";
+            StateHasChanged();
+            return;
+        }
+        
+        if (!sendToAdmin && !sendToFaculty && !sendToStudent)
+        {
+            errorMessage = "Please select at least one recipient group";
+            StateHasChanged();
+            await Task.Delay(3000);
+            errorMessage = "";
+            StateHasChanged();
+            return;
+        }
+        
+        isSending = true;
+        StateHasChanged();
+        
+        try
+        {
+            var recipients = new List<string>();
+            
+            if (sendToAdmin)
+            {
+                await NotificationService.SendRoleBasedNotificationAsync(notificationTitle, notificationMessage, "Admin", priority);
+                recipients.Add("Admin");
+                Console.WriteLine("Sent to Admin");
+            }
+            
+            if (sendToFaculty)
+            {
+                await NotificationService.SendRoleBasedNotificationAsync(notificationTitle, notificationMessage, "Faculty", priority);
+                recipients.Add("Faculty");
+                Console.WriteLine("Sent to Faculty");
+            }
+            
+            if (sendToStudent)
+            {
+                await NotificationService.SendRoleBasedNotificationAsync(notificationTitle, notificationMessage, "Student", priority);
+                recipients.Add("Students");
+                Console.WriteLine("Sent to Students");
+            }
+            
+            successMessage = $"✅ Broadcast sent successfully to: {string.Join(", ", recipients)}!";
+            
+            // Clear form
+            notificationTitle = "";
+            notificationMessage = "";
+            sendToAdmin = false;
+            sendToFaculty = false;
+            sendToStudent = true;
+            
+            await LoadRecentNotifications();
+            
+            // Show success message
+            StateHasChanged();
+            await Task.Delay(5000);
+            successMessage = "";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error sending broadcast: {ex.Message}";
+            Console.WriteLine($"Broadcast error: {ex.Message}");
+            StateHasChanged();
+            await Task.Delay(5000);
+            errorMessage = "";
+            StateHasChanged();
+        }
+        finally
+        {
+            isSending = false;
+            StateHasChanged();
+        }
+    }
+}

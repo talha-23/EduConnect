@@ -10,11 +10,13 @@ builder.Services.AddServerSideBlazor();
 // Register services for Module 1 (already exists)
 builder.Services.AddScoped<IAuthStateService, AuthStateService>();
 
-// Register services for Module 2 (UPDATED - No circular dependencies)
-builder.Services.AddScoped<IStudentService, StudentService>();
+// Register services for Module 2 - Fixed circular dependencies
+// Register services in order of dependency (least dependent first)
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
-builder.Services.AddScoped<IStudentEnrollmentValidator, StudentEnrollmentValidator>(); // NEW
+builder.Services.AddScoped<IGradeService, GradeService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 var app = builder.Build();
 

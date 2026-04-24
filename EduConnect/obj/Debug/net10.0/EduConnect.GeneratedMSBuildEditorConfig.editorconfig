@@ -30,8 +30,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xOYXZCYXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Components/NotificationBell.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xOb3RpZmljYXRpb25CZWxsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/AddStudent.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYWdlXEFkZFN0dWRlbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/AdminNotifications.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYWdlXEFkbWluTm90aWZpY2F0aW9ucy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/AdminReports.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYWdlXEFkbWluUmVwb3J0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/Courses.razor]
@@ -58,12 +70,28 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/FacultyPage/Grades.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRmFjdWx0eVBhZ2VcR3JhZGVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/FacultyPage/MyCourses.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRmFjdWx0eVBhZ2VcTXlDb3Vyc2VzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/Notifications.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTm90aWZpY2F0aW9ucy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/StudentPage/Enroll.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3R1ZGVudFBhZ2VcRW5yb2xsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/StudentPage/MyGrades.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3R1ZGVudFBhZ2VcTXlHcmFkZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/TestAuth.razor]

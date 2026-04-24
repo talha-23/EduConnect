@@ -1,0 +1,201 @@
+﻿@page "/notifications"
+@using EduConnect.Services.Interfaces
+@using EduConnect.Models
+@inject INotificationService NotificationService
+@inject IAuthStateService AuthStateService
+@inject NavigationManager Navigation
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-bell"></i> Notifications
+                    </h4>
+                    <div>
+                        @if (unreadCount > 0)
+                        {
+                            <button class="btn btn-light btn-sm me-2" @onclick="MarkAllAsRead">
+                                <i class="bi bi-check2-all"></i> Mark all as read (@unreadCount)
+                            </button>
+                        }
+                        <button class="btn btn-outline-light btn-sm" @onclick="RefreshNotifications">
+                            <i class="bi bi-arrow-repeat"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (isLoading)
+                    {
+                        <div class="text-center p-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                    else if (!notifications.Any())
+                    {
+                        <div class="text-center p-5 text-muted">
+                            <i class="bi bi-bell-slash fs-1"></i>
+                            <h5 class="mt-3">No Notifications</h5>
+                            <p>You don't have any notifications at this time.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="notification-list">
+                            @foreach (var notification in notifications)
+                            {
+                                <div class="card mb-3 @(!notification.IsRead ? "border-primary" : "")">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="d-flex">
+                                                <div class="me-3">
+                                                    <div class="notification-icon @notification.GetPriorityClass()">
+                                                        <i class="bi @notification.GetIcon() fs-5"></i>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h6 class="card-title mb-1">
+                                                        @notification.Title
+                                                        @if (!notification.IsRead)
+                                                        {
+                                                            <span class="badge bg-primary ms-2">New</span>
+                                                        }
+                                                    </h6>
+                                                    <p class="card-text">@notification.Message</p>
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-clock"></i> @notification.TimeAgo
+                                                        @if (notification.NotificationType != "Announcement")
+                                                        {
+                                                            <span class="ms-2">
+                                                                <i class="bi bi-tag"></i> @notification.NotificationType
+                                                            </span>
+                                                        }
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                @if (!notification.IsRead)
+                                                {
+                                                    <button class="btn btn-sm btn-outline-primary me-2" 
+                                                            @onclick="() => MarkAsRead(notification.Id)">
+                                                        <i class="bi bi-envelope-open"></i> Mark as read
+                                                    </button>
+                                                }
+                                                <button class="btn btn-sm btn-outline-danger" 
+                                                        @onclick="() => DeleteNotification(notification.Id)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    .notification-icon.bg-info { background-color: #0dcaf0; }
+    .notification-icon.bg-success { background-color: #198754; }
+    .notification-icon.bg-warning { background-color: #ffc107; }
+    .notification-icon.bg-danger { background-color: #dc3545; }
+</style>
+
+@code {
+    private List<Notification> notifications = new();
+    private int unreadCount = 0;
+    private bool isLoading = true;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNotifications();
+        
+        // Subscribe to new notifications
+        NotificationService.OnNewNotification += OnNewNotification;
+    }
+    
+    private async Task LoadNotifications()
+    {
+        if (AuthStateService.IsAuthenticated && AuthStateService.CurrentUser != null)
+        {
+            isLoading = true;
+            notifications = await NotificationService.GetUserNotificationsAsync(AuthStateService.CurrentUser.Id);
+            unreadCount = notifications.Count(n => !n.IsRead);
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+    
+    private async void OnNewNotification(Notification notification)
+    {
+        await LoadNotifications();
+        StateHasChanged();
+    }
+    
+    private async Task MarkAsRead(Guid notificationId)
+    {
+        await NotificationService.MarkAsReadAsync(notificationId);
+        await LoadNotifications();
+    }
+    
+    private async Task MarkAllAsRead()
+    {
+        if (AuthStateService.CurrentUser != null)
+        {
+            await NotificationService.MarkAllAsReadAsync(AuthStateService.CurrentUser.Id);
+            await LoadNotifications();
+        }
+    }
+    
+    private async Task DeleteNotification(Guid notificationId)
+    {
+        var confirmed = await ShowConfirmDialog("Are you sure you want to delete this notification?", "Confirm Delete");
+        if (confirmed)
+        {
+            await NotificationService.DeleteNotificationAsync(notificationId);
+            await LoadNotifications();
+            await ShowAlert("Notification deleted successfully!", "success");
+        }
+    }
+    
+    private async Task RefreshNotifications()
+    {
+        await LoadNotifications();
+        await ShowAlert("Notifications refreshed!", "info");
+    }
+    
+    private async Task<bool> ShowConfirmDialog(string message, string title)
+    {
+        return await JSRuntime.InvokeAsync<bool>("showConfirm", message, title);
+    }
+    
+    private async Task ShowAlert(string message, string type)
+    {
+        await JSRuntime.InvokeVoidAsync("showToast", message, type);
+    }
+    
+    public void Dispose()
+    {
+        NotificationService.OnNewNotification -= OnNewNotification;
+    }
+    
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = default!;
+}

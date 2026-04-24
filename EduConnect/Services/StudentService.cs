@@ -18,41 +18,67 @@ namespace EduConnect.Services
 
         private void InitializeSampleData()
         {
-            _students.Add(new Student
+            // Student 1
+            var student1 = new Student
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 FullName = "BABER AZAM",
                 Email = "baber@educonnect.com",
-                Password = "password123",
+                Password = "baber123",
                 StudentId = "STU001",
                 Semester = 3,
                 CGPA = 3.8,
-                Department = "Computer Science"
-            });
+                Department = "Computer Science",
+                Enrollments = new List<Enrollment>()
+            };
+            _students.Add(student1);
 
-            _students.Add(new Student
+            // Student 2
+            var student2 = new Student
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                 FullName = "ALLAH DITA",
                 Email = "dita@educonnect.com",
-                Password = "password123",
+                Password = "dita123",
                 StudentId = "STU002",
                 Semester = 2,
                 CGPA = 3.2,
-                Department = "Software Engineering"
-            });
+                Department = "Software Engineering",
+                Enrollments = new List<Enrollment>()
+            };
+            _students.Add(student2);
 
-            _students.Add(new Student
+            // Student 3
+            var student3 = new Student
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
                 FullName = "MIA ASLAM",
                 Email = "aslam@educonnect.com",
-                Password = "password123",
+                Password = "aslam123",
                 StudentId = "STU003",
                 Semester = 5,
                 CGPA = 3.9,
-                Department = "Computer Science"
-            });
+                Department = "Computer Science",
+                Enrollments = new List<Enrollment>()
+            };
+            _students.Add(student3);
+
+            // Student 4 - The one that was logging in (ABDUL MOEEZ RAZA KAZMI)
+            var student4 = new Student
+            {
+                Id = Guid.Parse("537bdf6b-06e0-45cc-aec8-5512168ae5bb"),
+                FullName = "ABDUL MOEEZ RAZA KAZMI",
+                Email = "student@educonnect.com",
+                Password = "student123",
+                StudentId = "STU004",
+                Semester = 3,
+                CGPA = 3.5,
+                Department = "Computer Science",
+                Enrollments = new List<Enrollment>()
+            };
+            _students.Add(student4);
+
+            Console.WriteLine($"StudentService initialized with {_students.Count} students");
         }
 
         public async Task<List<Student>> GetAllStudentsAsync()
@@ -64,7 +90,9 @@ namespace EduConnect.Services
         public async Task<Student?> GetStudentByIdAsync(Guid id)
         {
             await Task.Delay(50);
-            return _students.FirstOrDefault(s => s.Id == id);
+            var student = _students.FirstOrDefault(s => s.Id == id);
+            Console.WriteLine($"Looking for student with ID: {id} - Found: {(student != null ? student.FullName : "Not found")}");
+            return student;
         }
 
         public async Task<Student?> GetStudentByEmailAsync(string email)
@@ -92,6 +120,7 @@ namespace EduConnect.Services
             await Task.Delay(100);
             student.Id = Guid.NewGuid();
             student.Password = "default123";
+            student.Enrollments = new List<Enrollment>();
             _students.Add(student);
             return student;
         }
@@ -125,15 +154,48 @@ namespace EduConnect.Services
 
         public async Task<bool> CanDeleteStudentAsync(Guid id)
         {
-            // This method should be implemented using IStudentEnrollmentValidator
-            // For now, return true (you'll use the validator service instead)
-            return true;
+            var student = await GetStudentByIdAsync(id);
+            if (student == null) return false;
+
+            // Check if student has any active enrollments using the Enrollments collection
+            bool hasEnrollments = student.Enrollments != null && student.Enrollments.Any(e => e.IsActive);
+
+            return !hasEnrollments;
         }
 
         public async Task<int> GetTotalStudentsCountAsync()
         {
             await Task.Delay(50);
             return _students.Count;
+        }
+
+        // Method to add enrollment to student (called from EnrollmentService)
+        public void AddEnrollmentToStudent(Guid studentId, Enrollment enrollment)
+        {
+            var student = _students.FirstOrDefault(s => s.Id == studentId);
+            if (student != null)
+            {
+                if (student.Enrollments == null)
+                    student.Enrollments = new List<Enrollment>();
+
+                student.Enrollments.Add(enrollment);
+                Console.WriteLine($"Enrollment added to student {student.FullName}");
+            }
+        }
+
+        // Method to remove enrollment from student (called from EnrollmentService)
+        public void RemoveEnrollmentFromStudent(Guid studentId, Guid enrollmentId)
+        {
+            var student = _students.FirstOrDefault(s => s.Id == studentId);
+            if (student != null && student.Enrollments != null)
+            {
+                var enrollment = student.Enrollments.FirstOrDefault(e => e.Id == enrollmentId);
+                if (enrollment != null)
+                {
+                    enrollment.IsActive = false;
+                    Console.WriteLine($"Enrollment removed from student {student.FullName}");
+                }
+            }
         }
     }
 }

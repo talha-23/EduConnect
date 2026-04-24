@@ -1,0 +1,348 @@
+﻿@page "/admin/reports/grades"
+@attribute [Authorize(Roles = "Admin")]
+@using Microsoft.AspNetCore.Authorization
+@using EduConnect.Services.Interfaces
+@using EduConnect.Models
+@inject IStudentService StudentService
+@inject IGradeService GradeService
+@inject IEnrollmentService EnrollmentService
+@inject IJSRuntime JSRuntime
+
+<div class="container mt-4">
+    <h2 class="mb-4">Grade Reports & Analytics</h2>
+    
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading reports...</p>
+        </div>
+    }
+    else
+    {
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Students</h5>
+                        <h2 class="mb-0">@totalStudents</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Average CGPA</h5>
+                        <h2 class="mb-0">@averageCgpa.ToString("F2")</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Dean's List</h5>
+                        <h2 class="mb-0">@deansListCount</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Probation</h5>
+                        <h2 class="mb-0">@probationCount</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Grade Distribution Chart -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">CGPA Distribution</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="progress mb-3" style="height: 30px;">
+                            <div class="progress-bar bg-success" style="width: @(gradeDistribution.Excellent)%; min-width: 30px;">
+                                Excellent @(gradeDistribution.Excellent)%
+                            </div>
+                            <div class="progress-bar bg-info" style="width: @(gradeDistribution.Good)%; min-width: 30px;">
+                                Good @(gradeDistribution.Good)%
+                            </div>
+                            <div class="progress-bar bg-warning" style="width: @(gradeDistribution.Average)%; min-width: 30px;">
+                                Average @(gradeDistribution.Average)%
+                            </div>
+                            <div class="progress-bar bg-danger" style="width: @(gradeDistribution.Poor)%; min-width: 30px;">
+                                Poor @(gradeDistribution.Poor)%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-sm">
+                            <tr class="bg-success text-white">
+                                <td>Excellent (CGPA 3.5+)</td>
+                                <td class="text-end">@gradeDistribution.ExcellentCount students</td>
+                            </tr>
+                            <tr class="bg-info text-white">
+                                <td>Good (CGPA 3.0 - 3.49)</td>
+                                <td class="text-end">@gradeDistribution.GoodCount students</td>
+                            </tr>
+                            <tr class="bg-warning">
+                                <td>Average (CGPA 2.5 - 2.99)</td>
+                                <td class="text-end">@gradeDistribution.AverageCount students</td>
+                            </tr>
+                            <tr class="bg-danger text-white">
+                                <td>Poor (CGPA Below 2.5)</td>
+                                <td class="text-end">@gradeDistribution.PoorCount students</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Students List with CGPA -->
+        <div class="card">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Student Performance Report</h5>
+                <button class="btn btn-sm btn-light" @onclick="ExportToCsv">
+                    <i class="bi bi-download"></i> Export to CSV
+                </button>
+            </div>
+            <div class="card-body">
+                @if (!studentsWithCgpa.Any())
+                {
+                    <div class="alert alert-info">
+                        No student data available. Please add some students and grades first.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Semester</th>
+                                    <th>CGPA</th>
+                                    <th>Grade</th>
+                                    <th>Status</th>
+                                    <th>Enrolled Courses</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in studentsWithCgpa.OrderByDescending(s => s.CGPA))
+                                {
+                                    <tr>
+                                        <td>@item.StudentId</td>
+                                        <td>@item.FullName</td>
+                                        <td>@item.Department</td>
+                                        <td>Semester @item.Semester</td>
+                                        <td>
+                                            <span class="badge @GetCgpaBadgeClass(item.CGPA)" style="font-size: 1rem;">
+                                                @item.CGPA.ToString("F2")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge @GetGradeBadgeClass(GetLetterGrade(item.CGPA))">
+                                                @GetLetterGrade(item.CGPA)
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if (item.CGPA >= 3.5)
+                                            {
+                                                <span class="badge bg-success">Dean's List</span>
+                                            }
+                                            else if (item.CGPA < 2.0 && item.CGPA > 0)
+                                            {
+                                                <span class="badge bg-danger">Probation</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-info">Good Standing</span>
+                                            }
+                                        </td>
+                                        <td>@item.EnrolledCount</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Student> students = new();
+    private List<StudentWithCgpa> studentsWithCgpa = new();
+    private bool isLoading = true;
+    private int totalStudents = 0;
+    private double averageCgpa = 0;
+    private int deansListCount = 0;
+    private int probationCount = 0;
+    private GradeDistribution gradeDistribution = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    
+    private async Task LoadData()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+            
+            // Get all students
+            students = await StudentService.GetAllStudentsAsync();
+            totalStudents = students.Count;
+            
+            studentsWithCgpa = new List<StudentWithCgpa>();
+            double totalCgpa = 0;
+            int studentsWithCgpaCount = 0;
+            
+            foreach (var student in students)
+            {
+                // Calculate CGPA for each student
+                var cgpa = await GradeService.CalculateStudentCGPAAsync(student.Id);
+                var enrolledCourses = await EnrollmentService.GetStudentEnrolledCoursesAsync(student.Id);
+                
+                if (cgpa > 0)
+                {
+                    totalCgpa += cgpa;
+                    studentsWithCgpaCount++;
+                }
+                
+                studentsWithCgpa.Add(new StudentWithCgpa
+                {
+                    Id = student.Id,
+                    StudentId = student.StudentId,
+                    FullName = student.FullName,
+                    Department = student.Department,
+                    Semester = student.Semester,
+                    CGPA = cgpa,
+                    EnrolledCount = enrolledCourses.Count
+                });
+            }
+            
+            // Calculate average CGPA
+            averageCgpa = studentsWithCgpaCount > 0 ? totalCgpa / studentsWithCgpaCount : 0;
+            
+            // Calculate counts
+            deansListCount = studentsWithCgpa.Count(s => s.CGPA >= 3.5);
+            probationCount = studentsWithCgpa.Count(s => s.CGPA < 2.0 && s.CGPA > 0);
+            
+            // Calculate grade distribution
+            gradeDistribution.ExcellentCount = studentsWithCgpa.Count(s => s.CGPA >= 3.5);
+            gradeDistribution.GoodCount = studentsWithCgpa.Count(s => s.CGPA >= 3.0 && s.CGPA < 3.5);
+            gradeDistribution.AverageCount = studentsWithCgpa.Count(s => s.CGPA >= 2.5 && s.CGPA < 3.0);
+            gradeDistribution.PoorCount = studentsWithCgpa.Count(s => s.CGPA < 2.5 && s.CGPA > 0);
+            
+            var totalWithCgpa = studentsWithCgpa.Count(s => s.CGPA > 0);
+            if (totalWithCgpa > 0)
+            {
+                gradeDistribution.Excellent = (gradeDistribution.ExcellentCount * 100) / totalWithCgpa;
+                gradeDistribution.Good = (gradeDistribution.GoodCount * 100) / totalWithCgpa;
+                gradeDistribution.Average = (gradeDistribution.AverageCount * 100) / totalWithCgpa;
+                gradeDistribution.Poor = (gradeDistribution.PoorCount * 100) / totalWithCgpa;
+            }
+            
+            Console.WriteLine($"Reports loaded: {studentsWithCgpa.Count} students with CGPA data");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading reports: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+    
+    private string GetCgpaBadgeClass(double cgpa)
+    {
+        if (cgpa >= 3.5) return "bg-success";
+        if (cgpa >= 3.0) return "bg-info";
+        if (cgpa >= 2.5) return "bg-warning";
+        if (cgpa > 0) return "bg-danger";
+        return "bg-secondary";
+    }
+    
+    private string GetGradeBadgeClass(string grade)
+    {
+        return grade switch
+        {
+            "A" => "bg-success",
+            "B" => "bg-info",
+            "C" => "bg-warning",
+            "D" => "bg-secondary",
+            "F" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+    
+    private string GetLetterGrade(double cgpa)
+    {
+        if (cgpa >= 3.5) return "A";
+        if (cgpa >= 3.0) return "B";
+        if (cgpa >= 2.5) return "C";
+        if (cgpa >= 2.0) return "D";
+        if (cgpa > 0) return "F";
+        return "N/A";
+    }
+    
+    private async Task ExportToCsv()
+    {
+        try
+        {
+            var csv = new System.Text.StringBuilder();
+            csv.AppendLine("Student ID,Name,Department,Semester,CGPA,Grade,Status,Enrolled Courses");
+            
+            foreach (var item in studentsWithCgpa.OrderByDescending(s => s.CGPA))
+            {
+                var status = item.CGPA >= 3.5 ? "Dean's List" : (item.CGPA < 2.0 && item.CGPA > 0 ? "Probation" : "Good Standing");
+                var grade = GetLetterGrade(item.CGPA);
+                csv.AppendLine($"\"{item.StudentId}\",\"{item.FullName}\",\"{item.Department}\",{item.Semester},{item.CGPA:F2},{grade},{status},{item.EnrolledCount}");
+            }
+            
+            await JSRuntime.InvokeVoidAsync("saveAsFile", $"student_report_{DateTime.Now:yyyyMMdd_HHmmss}.csv", csv.ToString());
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Export error: {ex.Message}");
+        }
+    }
+    
+    private class GradeDistribution
+    {
+        public int ExcellentCount { get; set; }
+        public int GoodCount { get; set; }
+        public int AverageCount { get; set; }
+        public int PoorCount { get; set; }
+        public double Excellent { get; set; }
+        public double Good { get; set; }
+        public double Average { get; set; }
+        public double Poor { get; set; }
+    }
+    
+    private class StudentWithCgpa
+    {
+        public Guid Id { get; set; }
+        public string StudentId { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string Department { get; set; } = string.Empty;
+        public int Semester { get; set; }
+        public double CGPA { get; set; }
+        public int EnrolledCount { get; set; }
+    }
+}

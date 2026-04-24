@@ -1,0 +1,192 @@
+﻿@inject INotificationService NotificationService
+@inject IAuthStateService AuthStateService
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<div class="dropdown" @onclick="ToggleDropdown">
+    <button class="btn btn-link text-white position-relative" type="button" data-bs-toggle="dropdown">
+        <i class="bi bi-bell-fill fs-5"></i>
+        @if (unreadCount > 0)
+        {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                @(unreadCount > 99 ? "99+" : unreadCount)
+                <span class="visually-hidden">unread notifications</span>
+            </span>
+        }
+    </button>
+    
+    <div class="dropdown-menu dropdown-menu-end notification-dropdown" style="width: 350px;">
+        <div class="dropdown-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Notifications</h6>
+            @if (unreadCount > 0)
+            {
+                <button class="btn btn-sm btn-link" @onclick="MarkAllAsRead" @onclick:stopPropagation="true">
+                    Mark all as read
+                </button>
+            }
+        </div>
+        
+        <div class="dropdown-divider"></div>
+        
+        @if (isLoading)
+        {
+            <div class="text-center p-3">
+                <div class="spinner-border spinner-border-sm text-primary"></div>
+            </div>
+        }
+        else if (!recentNotifications.Any())
+        {
+            <div class="text-center p-4 text-muted">
+                <i class="bi bi-bell-slash fs-1"></i>
+                <p class="mb-0 mt-2">No notifications</p>
+            </div>
+        }
+        else
+        {
+            <div class="notification-list" style="max-height: 400px; overflow-y: auto;">
+                @foreach (var notification in recentNotifications)
+                {
+                    <div class="notification-item @(!notification.IsRead ? "unread" : "")" 
+                         @onclick="() => MarkAsRead(notification.Id)" 
+                         @onclick:stopPropagation="true">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <div class="notification-icon @notification.GetPriorityClass()">
+                                    <i class="bi @notification.GetIcon()"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="d-flex justify-content-between">
+                                    <strong>@notification.Title</strong>
+                                    <small class="text-muted">@notification.TimeAgo</small>
+                                </div>
+                                <p class="mb-1 small">@notification.Message</p>
+                                @if (!notification.IsRead)
+                                {
+                                    <span class="badge bg-primary">New</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider m-0"></div>
+                }
+            </div>
+        }
+        
+        <div class="dropdown-footer text-center p-2">
+            <a href="/notifications" class="text-decoration-none small" @onclick:stopPropagation="true">
+                View all notifications
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .notification-dropdown {
+        padding: 0;
+    }
+    
+    .notification-item {
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .notification-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .notification-item.unread {
+        background-color: #e3f2fd;
+    }
+    
+    .notification-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    .notification-icon.bg-info { background-color: #0dcaf0; }
+    .notification-icon.bg-success { background-color: #198754; }
+    .notification-icon.bg-warning { background-color: #ffc107; }
+    .notification-icon.bg-danger { background-color: #dc3545; }
+    
+    .dropdown-header {
+        padding: 12px 16px;
+        background-color: #f8f9fa;
+    }
+    
+    .dropdown-footer {
+        background-color: #f8f9fa;
+    }
+</style>
+
+@code {
+    private List<Notification> recentNotifications = new();
+    private int unreadCount = 0;
+    private bool isLoading = true;
+    private bool isOpen = false;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        // Subscribe to new notifications
+        NotificationService.OnNewNotification += OnNewNotification;
+        
+        await LoadNotifications();
+        
+        // Refresh every 30 seconds
+        var timer = new System.Timers.Timer(30000);
+        timer.Elapsed += async (sender, e) => await LoadNotifications();
+        timer.Start();
+    }
+    
+    private async Task LoadNotifications()
+    {
+        if (AuthStateService.IsAuthenticated && AuthStateService.CurrentUser != null)
+        {
+            isLoading = true;
+            var allNotifications = await NotificationService.GetUserNotificationsAsync(AuthStateService.CurrentUser.Id);
+            recentNotifications = allNotifications.Take(5).ToList();
+            unreadCount = await NotificationService.GetUnreadCountAsync(AuthStateService.CurrentUser.Id);
+            isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+    
+    private async void OnNewNotification(Notification notification)
+    {
+        await LoadNotifications();
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    private void ToggleDropdown()
+    {
+        isOpen = !isOpen;
+    }
+    
+    private async Task MarkAsRead(Guid notificationId)
+    {
+        await NotificationService.MarkAsReadAsync(notificationId);
+        await LoadNotifications();
+        StateHasChanged();
+    }
+    
+    private async Task MarkAllAsRead()
+    {
+        if (AuthStateService.CurrentUser != null)
+        {
+            await NotificationService.MarkAllAsReadAsync(AuthStateService.CurrentUser.Id);
+            await LoadNotifications();
+            StateHasChanged();
+        }
+    }
+    
+    public void Dispose()
+    {
+        NotificationService.OnNewNotification -= OnNewNotification;
+    }
+}

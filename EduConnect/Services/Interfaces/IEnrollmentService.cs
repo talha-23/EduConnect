@@ -11,5 +11,8 @@ namespace EduConnect.Services.Interfaces
         Task<bool> IsStudentEnrolledAsync(Guid studentId, Guid courseId);
         Task<int> GetStudentTotalCreditsAsync(Guid studentId);
         Task<bool> HasStudentDroppedCourseBeforeAsync(Guid studentId, Guid courseId);
+        Task<List<Enrollment>> GetAllEnrollmentsAsync();
+        Task<List<Student>> GetStudentsByCourseAsync(Guid courseId);
+        Task<int> GetEnrollmentCountByCourseAsync(Guid courseId);
     }
 }

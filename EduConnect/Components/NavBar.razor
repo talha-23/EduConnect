@@ -1,4 +1,5 @@
-﻿@inject IAuthStateService AuthService
+﻿@using EduConnect.Components
+@inject IAuthStateService AuthService
 @inject NavigationManager Navigation
 @implements IDisposable
 
@@ -59,7 +60,7 @@
                                 </li>
                                 <li>
                                     <a class="dropdown-item" href="/admin/notifications">
-                                        <i class="bi bi-bell"></i> Broadcast Message
+                                        <i class="bi bi-megaphone"></i> Broadcast Message
                                     </a>
                                 </li>
                             </ul>
@@ -109,22 +110,17 @@
                             </ul>
                         </li>
                     }
-                    
-                    <!-- Notifications - Common for all authenticated roles -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="/notifications">
-                            <i class="bi bi-bell"></i> Notifications
-                            @if (unreadCount > 0)
-                            {
-                                <span class="badge bg-danger rounded-pill">@unreadCount</span>
-                            }
-                        </a>
-                    </li>
                 </ul>
                 
-                <!-- User Info and Logout -->
+                <!-- User Info, Notifications, and Logout -->
                 <div class="navbar-nav ms-auto">
-                    <div class="nav-item dropdown">
+                    <!-- Notification Bell -->
+                    <li class="nav-item">
+                        <NotificationBell />
+                    </li>
+                    
+                    <!-- User Dropdown -->
+                    <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i> @user.FullName
                             <span class="badge bg-info ms-1">@role</span>
@@ -143,6 +139,11 @@
                                     </a>
                                 </li>
                             }
+                            <li>
+                                <a class="dropdown-item" href="/notifications">
+                                    <i class="bi bi-bell"></i> Notifications
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <button class="dropdown-item text-danger" @onclick="Logout">
@@ -150,7 +151,7 @@
                                 </button>
                             </li>
                         </ul>
-                    </div>
+                    </li>
                 </div>
             }
             else
@@ -212,35 +213,17 @@
 </style>
 
 @code {
-    private int unreadCount = 0;
-    
     protected override void OnInitialized()
     {
         // Subscribe to auth events
         AuthService.OnLogin += OnAuthStateChanged;
         AuthService.OnLogout += OnAuthStateChanged;
-        
-        // Load unread notifications count (for Module 5)
-        LoadUnreadCount();
     }
     
     private void OnAuthStateChanged()
     {
         // Force UI refresh
         InvokeAsync(StateHasChanged);
-        
-        // Reload notifications count when user logs in
-        if (AuthService.IsAuthenticated)
-        {
-            LoadUnreadCount();
-        }
-    }
-    
-    private void LoadUnreadCount()
-    {
-        // This will be implemented in Module 5 (Notification System)
-        // For now, just set to 0
-        unreadCount = 0;
     }
     
     private async void Logout()

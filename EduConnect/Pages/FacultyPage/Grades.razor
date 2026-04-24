@@ -1,0 +1,443 @@
+﻿@page "/faculty/grades"
+@attribute [Authorize(Roles = "Faculty")]
+@using Microsoft.AspNetCore.Authorization
+@using EduConnect.Services.Interfaces
+@using EduConnect.Models
+@inject ICourseService CourseService
+@inject IStudentService StudentService
+@inject IGradeService GradeService
+@inject IEnrollmentService EnrollmentService
+@inject IAuthStateService AuthStateService
+@inject NavigationManager Navigation
+
+<div class="container mt-4">
+    <h2 class="mb-4">Grade Submission</h2>
+    
+    @if (showSuccess)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    @if (showError)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @errorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    <!-- Course Selection -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Select Course</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Course</label>
+                    <select class="form-select" @onchange="OnCourseSelected">
+                        <option value="">-- Select a course --</option>
+                        @foreach (var course in assignedCourses)
+                        {
+                            <option value="@course.Id">@course.Code - @course.Title (Enrolled: @course.CurrentEnrollment/@course.MaxCapacity)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Total Students</label>
+                    <input type="text" class="form-control" readonly value="@enrolledStudents.Count" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Grades Submitted</label>
+                    <input type="text" class="form-control" readonly value="@submittedCount" />
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Grade Entry Table -->
+    @if (selectedCourseId != Guid.Empty)
+    {
+        if (isLoadingStudents)
+        {
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading students...</span>
+                </div>
+                <p>Loading enrolled students...</p>
+            </div>
+        }
+        else if (!enrolledStudents.Any())
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> No students are enrolled in this course yet.
+            </div>
+        }
+        else
+        {
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Enter Grades for @selectedCourse?.Title</h5>
+                    <button class="btn btn-light btn-sm" @onclick="SubmitAllGrades" disabled="@isSubmitting">
+                        @if (isSubmitting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                        }
+                        <i class="bi bi-save"></i> Submit All Grades
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Email</th>
+                                    <th>Current Grade</th>
+                                    <th>Marks (0-100)</th>
+                                    <th>Letter Grade</th>
+                                    <th>Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var student in enrolledStudents)
+                                {
+                                    var grade = GetGradeForStudent(student.Id);
+                                    var computedLetterGrade = GetLetterGradeFromMarks(grade.Marks);
+                                    var isValid = grade.Marks >= 0 && grade.Marks <= 100;
+                                    
+                                    <tr class="@(isValid ? "" : "table-danger") @GetRowClass(computedLetterGrade)">
+                                        <td>@student.StudentId</td
+                                        <td>@student.FullName</td
+                                        <td>@student.Email</td
+                                        <td>
+                                            @if (grade.Marks > 0)
+                                            {
+                                                <span class="badge @GetGradeBadgeClass(computedLetterGrade)">
+                                                    @computedLetterGrade
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Not graded</span>
+                                            }
+                                        </td
+                                        <td>
+                                            <input type="number" 
+                                                   class="form-control @(!isValid ? "is-invalid" : "")" 
+                                                   step="0.01" 
+                                                   min="0" 
+                                                   max="100"
+                                                   @bind="grade.Marks" 
+                                                   @bind:event="oninput" />
+                                            @if (!isValid && grade.Marks > 0)
+                                            {
+                                                <div class="invalid-feedback">Marks must be between 0-100</div>
+                                            }
+                                        </td
+                                        <td>
+                                            @if (grade.Marks > 0)
+                                            {
+                                                <span class="badge @GetGradeBadgeClass(computedLetterGrade) fs-6">
+                                                    @computedLetterGrade
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">--</span>
+                                            }
+                                        </td
+                                        <td>
+                                            @if (grade.Marks > 0)
+                                            {
+                                                if (computedLetterGrade == "F")
+                                                {
+                                                    <span class="badge bg-danger">Failed</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">Passed</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">Pending</span>
+                                            }
+                                        </td
+                                        <td>
+                                            <input type="text" class="form-control" placeholder="Optional remarks"
+                                                   @bind="grade.Remarks" />
+                                        </td
+                                    </tr>
+                                }
+                            </tbody>
+                            @if (submittedCount > 0)
+                            {
+                                <tfoot class="table-info">
+                                    <tr>
+                                        <td colspan="3"><strong>Summary</strong></td
+                                        <td><strong>Average: @averageMarks.ToString("F2")</strong></td
+                                        <td colspan="3">
+                                            <strong>Pass: @passCount | Fail: @failCount</strong>
+                                        </td
+                                    </tr>
+                                </tfoot>
+                            }
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private List<Course> assignedCourses = new();
+    private List<Student> enrolledStudents = new();
+    private Dictionary<Guid, GradeRecord> gradeRecords = new();
+    private Guid selectedCourseId = Guid.Empty;
+    private Course? selectedCourse;
+    private bool isLoadingCourses = true;
+    private bool isLoadingStudents = false;
+    private bool isSubmitting = false;
+    private string successMessage = "";
+    private bool showSuccess = false;
+    private string errorMessage = "";
+    private bool showError = false;
+    private int submittedCount = 0;
+    private double averageMarks = 0;
+    private int passCount = 0;
+    private int failCount = 0;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAssignedCourses();
+    }
+    
+    private async Task LoadAssignedCourses()
+    {
+        try
+        {
+            isLoadingCourses = true;
+            assignedCourses = await CourseService.GetAllCoursesAsync();
+            Console.WriteLine($"Loaded {assignedCourses.Count} courses");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading courses: {ex.Message}");
+        }
+        finally
+        {
+            isLoadingCourses = false;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task OnCourseSelected(ChangeEventArgs e)
+    {
+        var courseIdStr = e.Value?.ToString();
+        Console.WriteLine($"Course selected: {courseIdStr}");
+        
+        if (!string.IsNullOrEmpty(courseIdStr) && Guid.TryParse(courseIdStr, out var courseId))
+        {
+            selectedCourseId = courseId;
+            selectedCourse = await CourseService.GetCourseByIdAsync(selectedCourseId);
+            Console.WriteLine($"Selected course: {selectedCourse?.Title}");
+            
+            // Load enrolled students
+            await LoadEnrolledStudents();
+            await LoadExistingGrades();
+        }
+        else
+        {
+            selectedCourseId = Guid.Empty;
+            enrolledStudents.Clear();
+            gradeRecords.Clear();
+        }
+        StateHasChanged();
+    }
+    
+    private async Task LoadEnrolledStudents()
+    {
+        if (selectedCourseId == Guid.Empty) return;
+        
+        try
+        {
+            isLoadingStudents = true;
+            StateHasChanged();
+            
+            // This is the CRITICAL method - it must return students
+            enrolledStudents = await EnrollmentService.GetStudentsByCourseAsync(selectedCourseId);
+            
+            Console.WriteLine($"=== ENROLLED STUDENTS FOUND: {enrolledStudents.Count} ===");
+            foreach (var student in enrolledStudents)
+            {
+                Console.WriteLine($"  - {student.FullName} ({student.Email})");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading enrolled students: {ex.Message}");
+            errorMessage = $"Error loading students: {ex.Message}";
+            showError = true;
+        }
+        finally
+        {
+            isLoadingStudents = false;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task LoadExistingGrades()
+    {
+        gradeRecords.Clear();
+        
+        foreach (var student in enrolledStudents)
+        {
+            var existingGrade = await GradeService.GetGradeByStudentAndCourseAsync(student.Id, selectedCourseId);
+            if (existingGrade != null)
+            {
+                gradeRecords[student.Id] = existingGrade;
+            }
+            else
+            {
+                gradeRecords[student.Id] = new GradeRecord
+                {
+                    StudentId = student.Id,
+                    CourseId = selectedCourseId,
+                    FacultyId = AuthStateService.CurrentUser?.Id ?? Guid.NewGuid(),
+                    Marks = 0,
+                    Remarks = ""
+                };
+            }
+        }
+        
+        submittedCount = gradeRecords.Count(g => g.Value.Marks > 0);
+        UpdateSummary();
+    }
+    
+    private GradeRecord GetGradeForStudent(Guid studentId)
+    {
+        return gradeRecords.ContainsKey(studentId) ? gradeRecords[studentId] : new GradeRecord();
+    }
+    
+    private string GetLetterGradeFromMarks(double marks)
+    {
+        if (marks >= 85) return "A";
+        if (marks >= 70) return "B";
+        if (marks >= 55) return "C";
+        if (marks >= 45) return "D";
+        if (marks > 0) return "F";
+        return "";
+    }
+    
+    private string GetGradeBadgeClass(string grade)
+    {
+        return grade switch
+        {
+            "A" => "bg-success",
+            "B" => "bg-info",
+            "C" => "bg-warning",
+            "D" => "bg-secondary",
+            "F" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+    
+    private string GetRowClass(string grade)
+    {
+        return grade switch
+        {
+            "A" or "B" => "table-success",
+            "C" or "D" => "table-warning",
+            "F" => "table-danger",
+            _ => ""
+        };
+    }
+    
+    private void UpdateSummary()
+    {
+        var gradesWithMarks = gradeRecords.Values.Where(g => g.Marks > 0).ToList();
+        if (gradesWithMarks.Any())
+        {
+            averageMarks = gradesWithMarks.Average(g => g.Marks);
+            passCount = gradesWithMarks.Count(g => g.Marks >= 45);
+            failCount = gradesWithMarks.Count(g => g.Marks < 45 && g.Marks > 0);
+        }
+        else
+        {
+            averageMarks = 0;
+            passCount = 0;
+            failCount = 0;
+        }
+    }
+    
+    private async Task SubmitAllGrades()
+    {
+        if (!enrolledStudents.Any())
+        {
+            errorMessage = "No students enrolled in this course.";
+            showError = true;
+            await Task.Delay(3000);
+            showError = false;
+            return;
+        }
+        
+        isSubmitting = true;
+        showError = false;
+        showSuccess = false;
+        StateHasChanged();
+        
+        try
+        {
+            var gradesToSubmit = new List<GradeRecord>();
+            
+            foreach (var grade in gradeRecords.Values)
+            {
+                if (grade.Marks > 0)
+                {
+                    if (!await GradeService.ValidateMarksAsync(grade.Marks))
+                    {
+                        errorMessage = "Invalid marks. Marks must be between 0 and 100";
+                        showError = true;
+                        return;
+                    }
+                    grade.LetterGrade = GetLetterGradeFromMarks(grade.Marks);
+                    gradesToSubmit.Add(grade);
+                }
+            }
+            
+            if (gradesToSubmit.Any())
+            {
+                await GradeService.SubmitMultipleGradesAsync(gradesToSubmit);
+                successMessage = $"Successfully submitted {gradesToSubmit.Count} grade(s)!";
+                showSuccess = true;
+                await LoadExistingGrades();
+            }
+            else
+            {
+                errorMessage = "No grades entered to submit.";
+                showError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+            showError = true;
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+            await Task.Delay(3000);
+            showSuccess = false;
+            showError = false;
+            StateHasChanged();
+        }
+    }
+}

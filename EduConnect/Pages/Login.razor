@@ -56,6 +56,9 @@
                             <button class="btn btn-sm btn-outline-success m-1" @onclick='() => FillCredentials("faculty")'>Faculty Login</button>
 
                             <button class="btn btn-sm btn-outline-info m-1" @onclick='() => FillCredentials("student")'>Student Login</button>
+                            <button class="btn btn-outline-secondary btn-sm" @onclick='() => FillCredentials("baber")'>Student (Baber)</button>
+                            <button class="btn btn-sm btn-outline-warning" @onclick='() => FillCredentials("dita")'>Student (Dita)</button>
+                            <button class="btn btn-sm btn-outline-dark" @onclick='() => FillCredentials("aslam")'>Student (Aslam)</button>
                         </div>
                     </div>
                 </div>
@@ -82,20 +85,32 @@
     
     private void FillCredentials(string role)
     {
-        if (role == "admin")
+        switch (role)
         {
-            Email = "admin@educonnect.com";
-            Password = "admin123";
-        }
-        else if (role == "faculty")
-        {
-            Email = "faculty@educonnect.com";
-            Password = "faculty123";
-        }
-        else if (role == "student")
-        {
-            Email = "student@educonnect.com";
-            Password = "student123";
+            case "admin":
+                Email = "admin@educonnect.com";
+                Password = "admin123";
+                break;
+            case "faculty":
+                Email = "faculty@educonnect.com";
+                Password = "faculty123";
+                break;
+            case "student":
+                Email = "student@educonnect.com";
+                Password = "student123";
+                break;
+            case "baber":
+                Email = "baber@educonnect.com";
+                Password = "baber123";
+                break;
+            case "dita":
+                Email = "dita@educonnect.com";
+                Password = "dita123";
+                break;
+            case "aslam":
+                Email = "aslam@educonnect.com";
+                Password = "aslam123";
+                break;
         }
         StateHasChanged();
     }
