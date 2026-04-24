@@ -40,3 +40,4 @@ C:\Users\TALHA\Desktop\EduConnect\EduConnect\obj\Debug\net10.0\refint\EduConnect
 C:\Users\TALHA\Desktop\EduConnect\EduConnect\obj\Debug\net10.0\EduConnect.pdb
 C:\Users\TALHA\Desktop\EduConnect\EduConnect\obj\Debug\net10.0\EduConnect.genruntimeconfig.cache
 C:\Users\TALHA\Desktop\EduConnect\EduConnect\obj\Debug\net10.0\ref\EduConnect.dll
+C:\Users\TALHA\Desktop\EduConnect\EduConnect\obj\Debug\net10.0\compressed\9k735ou5yj-{0}-cn836my2oa-cn836my2oa.gz
