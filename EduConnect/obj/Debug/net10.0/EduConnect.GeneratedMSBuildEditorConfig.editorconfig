@@ -26,12 +26,36 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Components/AlertBox.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBbGVydEJveC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Components/ConfirmDialog.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDb25maXJtRGlhbG9nLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Components/CourseCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDb3Vyc2VDYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Components/GradeTable.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xHcmFkZVRhYmxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Components/LoadingSpinner.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMb2FkaW5nU3Bpbm5lci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Components/NavBar.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xOYXZCYXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Components/NotificationBell.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xOb3RpZmljYXRpb25CZWxsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Components/StudentCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTdHVkZW50Q2FyZC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/AddStudent.razor]

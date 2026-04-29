@@ -1,0 +1,156 @@
+﻿@typeparam TStudent
+
+<div class="card student-card h-100 shadow-sm" @onclick="OnCardClick">
+    <div class="card-body text-center">
+        <div class="student-avatar mb-3">
+            <div class="avatar-circle @GetCgpaColorClass()">
+                <span class="avatar-initials">@GetInitials()</span>
+            </div>
+        </div>
+        <h5 class="card-title">@Student?.FullName</h5>
+        <p class="card-text text-muted mb-1">@Student?.StudentId</p>
+        <p class="card-text mb-2">
+            <span class="badge bg-secondary">Semester @Student?.Semester</span>
+        </p>
+        <div class="cgpa-display">
+            <span class="badge @GetCgpaBadgeClass()" style="font-size: 1rem; padding: 8px 15px;">
+                CGPA: @Student?.CGPA.ToString("F2")
+            </span>
+        </div>
+        @if (ShowEnrollmentInfo)
+        {
+            <div class="mt-2">
+                <small class="text-muted">
+                    <i class="bi bi-journal-bookmark-fill"></i> @EnrolledCount Courses
+                </small>
+            </div>
+        }
+    </div>
+    <div class="card-footer bg-transparent border-top-0 text-center">
+        @if (ShowActions)
+        {
+            <button class="btn btn-sm btn-outline-primary me-1" @onclick:stopPropagation="true" @onclick="OnView">
+                <i class="bi bi-eye"></i> View
+            </button>
+            <button class="btn btn-sm btn-outline-warning me-1" @onclick:stopPropagation="true" @onclick="OnEdit">
+                <i class="bi bi-pencil"></i> Edit
+            </button>
+            @if (ShowDelete)
+            {
+                <button class="btn btn-sm btn-outline-danger" @onclick:stopPropagation="true" @onclick="OnDelete">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            }
+        }
+    </div>
+</div>
+
+<style>
+    .student-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .student-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .avatar-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    
+    .avatar-circle.bg-success-custom { background: linear-gradient(135deg, #28a745, #20c997); }
+    .avatar-circle.bg-info-custom { background: linear-gradient(135deg, #17a2b8, #5bc0de); }
+    .avatar-circle.bg-warning-custom { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+    .avatar-circle.bg-danger-custom { background: linear-gradient(135deg, #dc3545, #c82333); }
+    
+    .avatar-initials {
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    
+    .cgpa-display {
+        margin-top: 10px;
+    }
+</style>
+
+@code {
+    [Parameter] public Student? Student { get; set; }
+    [Parameter] public bool ShowActions { get; set; } = true;
+    [Parameter] public bool ShowDelete { get; set; } = true;
+    [Parameter] public bool ShowEnrollmentInfo { get; set; } = false;
+    [Parameter] public int EnrolledCount { get; set; } = 0;
+    [Parameter] public EventCallback<Student> OnViewClick { get; set; }
+    [Parameter] public EventCallback<Student> OnEditClick { get; set; }
+    [Parameter] public EventCallback<Student> OnDeleteClick { get; set; }
+    [Parameter] public EventCallback<Student> OnCardClickEvent { get; set; }
+
+    private string GetInitials()
+    {
+        if (string.IsNullOrEmpty(Student?.FullName)) return "?";
+        var parts = Student.FullName.Split(' ');
+        if (parts.Length >= 2)
+            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        return Student.FullName.Substring(0, Math.Min(2, Student.FullName.Length)).ToUpper();
+    }
+
+    private string GetCgpaColorClass()
+    {
+        if (Student == null) return "bg-secondary-custom";
+        if (Student.CGPA >= 3.5) return "bg-success-custom";
+        if (Student.CGPA >= 3.0) return "bg-info-custom";
+        if (Student.CGPA >= 2.5) return "bg-warning-custom";
+        return "bg-danger-custom";
+    }
+
+    private string GetCgpaBadgeClass()
+    {
+        if (Student == null) return "bg-secondary";
+        if (Student.CGPA >= 3.5) return "bg-success";
+        if (Student.CGPA >= 3.0) return "bg-info";
+        if (Student.CGPA >= 2.5) return "bg-warning";
+        return "bg-danger";
+    }
+
+    private void OnCardClick()
+    {
+        if (Student != null)
+        {
+            OnCardClickEvent.InvokeAsync(Student);
+        }
+    }
+
+    private void OnView()
+    {
+        if (Student != null)
+        {
+            OnViewClick.InvokeAsync(Student);
+        }
+    }
+
+    private void OnEdit()
+    {
+        if (Student != null)
+        {
+            OnEditClick.InvokeAsync(Student);
+        }
+    }
+
+    private void OnDelete()
+    {
+        if (Student != null)
+        {
+            OnDeleteClick.InvokeAsync(Student);
+        }
+    }
+}

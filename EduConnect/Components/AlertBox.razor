@@ -1,0 +1,54 @@
+﻿@typeparam TMessage
+
+<div class="alert alert-@GetAlertClass() alert-dismissible fade show" role="alert" @attributes="AdditionalAttributes">
+    @if (ShowIcon)
+    {
+        <i class="bi @GetIconClass() me-2"></i>
+    }
+    <strong>@Title</strong> @Message
+    @if (Dismissible)
+    {
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    }
+</div>
+
+@code {
+    [Parameter] public string Message { get; set; } = string.Empty;
+    [Parameter] public AlertType Type { get; set; } = AlertType.Info;
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public bool Dismissible { get; set; } = true;
+    [Parameter] public bool ShowIcon { get; set; } = true;
+    [Parameter] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string GetAlertClass()
+    {
+        return Type switch
+        {
+            AlertType.Success => "success",
+            AlertType.Warning => "warning",
+            AlertType.Error => "danger",
+            AlertType.Info => "info",
+            _ => "info"
+        };
+    }
+
+    private string GetIconClass()
+    {
+        return Type switch
+        {
+            AlertType.Success => "bi-check-circle-fill",
+            AlertType.Warning => "bi-exclamation-triangle-fill",
+            AlertType.Error => "bi-x-circle-fill",
+            AlertType.Info => "bi-info-circle-fill",
+            _ => "bi-info-circle-fill"
+        };
+    }
+
+    public enum AlertType
+    {
+        Success,
+        Warning,
+        Error,
+        Info
+    }
+}

@@ -1,0 +1,220 @@
+﻿@typeparam TGradeRecord
+
+<div class="grade-table-container">
+    @if (IsLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading grades...</p>
+        </div>
+    }
+    else if (!Grades.Any())
+    {
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> No grades available.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover grade-table">
+                <thead class="table-dark">
+                    <tr>
+                        @if (ShowStudentInfo)
+                        {
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                        }
+                        @if (ShowCourseInfo)
+                        {
+                            <th>Course Code</th>
+                            <th>Course Title</th>
+                        }
+                        <th>Credits</th>
+                        <th>Marks</th>
+                        <th>Letter Grade</th>
+                        <th>Grade Points</th>
+                        <th>Status</th>
+                        @if (ShowActions)
+                        {
+                            <th>Actions</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var grade in Grades)
+                    {
+                        var rowClass = GetRowClass(grade.LetterGrade);
+                        <tr class="@rowClass">
+                            @if (ShowStudentInfo)
+                            {
+                                <td>@grade.Student?.StudentId</td>
+                                <td>@grade.Student?.FullName</td>
+                            }
+                            @if (ShowCourseInfo)
+                            {
+                                <td>@grade.Course?.Code</td>
+                                <td>@grade.Course?.Title</td>
+                            }
+                            <td>@grade.Course?.CreditHours</td>
+                            <td>
+                                @if (grade.Marks > 0)
+                                {
+                                    <span class="fw-bold">@grade.Marks.ToString("F0")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not graded</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(grade.LetterGrade))
+                                {
+                                    <span class="badge @GetGradeBadgeClass(grade.LetterGrade)" style="font-size: 0.9rem;">
+                                        @grade.LetterGrade
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Pending</span>
+                                }
+                            </td>
+                            <td>
+                                @if (grade.GradePoints > 0)
+                                {
+                                    <span>@grade.GradePoints.ToString("F2")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(grade.LetterGrade))
+                                {
+                                    if (grade.LetterGrade == "F")
+                                    {
+                                        <span class="badge bg-danger">Failed</span>
+                                    }
+                                    else if (grade.LetterGrade == "A")
+                                    {
+                                        <span class="badge bg-success">Excellent</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info">Passed</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">In Progress</span>
+                                }
+                            </td>
+                            @if (ShowActions)
+                            {
+                                <td>
+                                    @if (Editable)
+                                    {
+                                        <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => OnEditClick.InvokeAsync(grade)">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </button>
+                                    }
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => OnDeleteClick.InvokeAsync(grade)">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+                @if (ShowSummary)
+                {
+                    <tfoot class="table-secondary">
+                        <tr>
+                            @if (ShowStudentInfo && ShowCourseInfo)
+                            {
+                                <td colspan="4"><strong>Total Credits:</strong></td>
+                            }
+                            else if (ShowStudentInfo || ShowCourseInfo)
+                            {
+                                <td colspan="3"><strong>Total Credits:</strong></td>
+                            }
+                            else
+                            {
+                                <td colspan="2"><strong>Total Credits:</strong></td>
+                            }
+                            <td><strong>@TotalCredits</strong></td>
+                            <td colspan="3"><strong>GPA: @Gpa.ToString("F2")</strong></td>
+                            @if (ShowActions)
+                            {
+                                <td></td>
+                            }
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+        </div>
+    }
+</div>
+
+<style>
+    .grade-table tbody tr {
+        transition: all 0.3s ease;
+    }
+    
+        .grade-table tbody tr:hover {
+            transform: scale(1.01);
+        }
+    
+    .grade-table .table-success {
+        background-color: #d4edda !important;
+    }
+    
+    .grade-table .table-warning {
+        background-color: #fff3cd !important;
+    }
+    
+    .grade-table .table-danger {
+        background-color: #f8d7da !important;
+    }
+</style>
+
+@code {
+    [Parameter] public List<GradeRecord> Grades { get; set; } = new();
+    [Parameter] public bool ShowStudentInfo { get; set; } = true;
+    [Parameter] public bool ShowCourseInfo { get; set; } = true;
+    [Parameter] public bool ShowActions { get; set; } = false;
+    [Parameter] public bool Editable { get; set; } = false;
+    [Parameter] public bool ShowSummary { get; set; } = true;
+    [Parameter] public bool IsLoading { get; set; } = false;
+    [Parameter] public int TotalCredits { get; set; } = 0;
+    [Parameter] public double Gpa { get; set; } = 0;
+    [Parameter] public EventCallback<GradeRecord> OnEditClick { get; set; }
+    [Parameter] public EventCallback<GradeRecord> OnDeleteClick { get; set; }
+
+    private string GetRowClass(string letterGrade)
+    {
+        return letterGrade switch
+        {
+            "A" or "B" => "table-success",
+            "C" or "D" => "table-warning",
+            "F" => "table-danger",
+            _ => ""
+        };
+    }
+
+    private string GetGradeBadgeClass(string grade)
+    {
+        return grade switch
+        {
+            "A" => "bg-success",
+            "B" => "bg-info",
+            "C" => "bg-warning",
+            "D" => "bg-secondary",
+            "F" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

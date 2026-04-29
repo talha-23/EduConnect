@@ -1,0 +1,99 @@
+﻿@if (IsVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" role="dialog" style="background: rgba(0,0,0,0.5)">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header @GetHeaderClass()">
+                    <h5 class="modal-title text-white">
+                        <i class="bi @GetIconClass() me-2"></i> @Title
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="Cancel"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@Message</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="Cancel">
+                        <i class="bi bi-x-circle"></i> @CancelText
+                    </button>
+                    <button class="btn @GetConfirmButtonClass()" @onclick="Confirm">
+                        <i class="bi @GetConfirmIconClass()"></i> @ConfirmText
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public string Title { get; set; } = "Confirm Action";
+    [Parameter] public string Message { get; set; } = "Are you sure?";
+    [Parameter] public string ConfirmText { get; set; } = "Confirm";
+    [Parameter] public string CancelText { get; set; } = "Cancel";
+    [Parameter] public ConfirmDialogType Type { get; set; } = ConfirmDialogType.Primary;
+    [Parameter] public EventCallback OnConfirmed { get; set; }
+    [Parameter] public EventCallback OnCancelled { get; set; }
+
+    private async Task Confirm()
+    {
+        await OnConfirmed.InvokeAsync();
+    }
+
+    private async Task Cancel()
+    {
+        await OnCancelled.InvokeAsync();
+    }
+
+    private string GetHeaderClass()
+    {
+        return Type switch
+        {
+            ConfirmDialogType.Danger => "bg-danger",
+            ConfirmDialogType.Warning => "bg-warning",
+            ConfirmDialogType.Success => "bg-success",
+            _ => "bg-primary"
+        };
+    }
+
+    private string GetIconClass()
+    {
+        return Type switch
+        {
+            ConfirmDialogType.Danger => "bi-exclamation-triangle-fill",
+            ConfirmDialogType.Warning => "bi-exclamation-diamond-fill",
+            ConfirmDialogType.Success => "bi-check-circle-fill",
+            _ => "bi-question-circle-fill"
+        };
+    }
+
+    private string GetConfirmButtonClass()
+    {
+        return Type switch
+        {
+            ConfirmDialogType.Danger => "btn-danger",
+            ConfirmDialogType.Warning => "btn-warning",
+            ConfirmDialogType.Success => "btn-success",
+            _ => "btn-primary"
+        };
+    }
+
+    private string GetConfirmIconClass()
+    {
+        return Type switch
+        {
+            ConfirmDialogType.Danger => "bi-trash",
+            ConfirmDialogType.Warning => "bi-exclamation-triangle",
+            ConfirmDialogType.Success => "bi-check-circle",
+            _ => "bi-check-lg"
+        };
+    }
+
+    public enum ConfirmDialogType
+    {
+        Primary,
+        Danger,
+        Warning,
+        Success
+    }
+}

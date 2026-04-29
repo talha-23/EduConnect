@@ -1,0 +1,184 @@
+﻿@typeparam TCourse
+
+<div class="card course-card h-100 shadow-sm">
+    <div class="card-header @GetStatusHeaderClass() text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-journal-bookmark-fill me-2"></i>
+            @Course?.Code - @Course?.Title
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="course-info mb-3">
+            <div class="row">
+                <div class="col-6">
+                    <small class="text-muted">Credits</small>
+                    <p class="fw-bold">@Course?.CreditHours</p>
+                </div>
+                <div class="col-6">
+                    <small class="text-muted">Instructor</small>
+                    <p class="fw-bold">@Course?.Instructor</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="enrollment-stats mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <small>Enrollment</small>
+                <small>@Course?.CurrentEnrollment / @Course?.MaxCapacity</small>
+            </div>
+            <div class="progress" style="height: 8px;">
+                <div class="progress-bar @GetProgressBarClass()" 
+                     style="width: @GetEnrollmentPercentage()%">
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-badge text-center mb-2">
+            <span class="badge @GetStatusBadgeClass()" style="font-size: 0.9rem;">
+                <i class="bi @GetStatusIcon() me-1"></i> @GetStatusText()
+            </span>
+        </div>
+        
+        @if (!string.IsNullOrEmpty(Course?.Description))
+        {
+            <p class="card-text small text-muted mt-2">@Course?.Description</p>
+        }
+    </div>
+    <div class="card-footer bg-transparent">
+        @if (ShowEnrollButton)
+        {
+            <button class="btn @GetEnrollButtonClass() w-100" 
+                    @onclick="OnEnroll" 
+                    disabled="@(Course?.IsFull ?? true)">
+                <i class="bi @GetEnrollButtonIcon() me-2"></i>
+                @GetEnrollButtonText()
+            </button>
+        }
+        @if (ShowAdminActions)
+        {
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-warning flex-grow-1" @onclick="OnEdit">
+                    <i class="bi bi-pencil"></i> Edit
+                </button>
+                <button class="btn btn-sm btn-outline-danger flex-grow-1" @onclick="OnDelete">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .course-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .card-header.bg-open { background: linear-gradient(135deg, #28a745, #20c997); }
+    .card-header.bg-almost-full { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+    .card-header.bg-full { background: linear-gradient(135deg, #dc3545, #c82333); }
+</style>
+
+@code {
+    [Parameter] public Course? Course { get; set; }
+    [Parameter] public bool ShowEnrollButton { get; set; } = true;
+    [Parameter] public bool ShowAdminActions { get; set; } = false;
+    [Parameter] public EventCallback<Course> OnEnrollClick { get; set; }
+    [Parameter] public EventCallback<Course> OnEditClick { get; set; }
+    [Parameter] public EventCallback<Course> OnDeleteClick { get; set; }
+
+    private double GetEnrollmentPercentage()
+    {
+        if (Course == null || Course.MaxCapacity == 0) return 0;
+        return (double)Course.CurrentEnrollment / Course.MaxCapacity * 100;
+    }
+
+    private string GetStatusHeaderClass()
+    {
+        if (Course == null) return "bg-secondary";
+        if (Course.IsFull) return "bg-full";
+        if (Course.AvailableSeats <= 5) return "bg-almost-full";
+        return "bg-open";
+    }
+
+    private string GetProgressBarClass()
+    {
+        var percentage = GetEnrollmentPercentage();
+        if (percentage >= 90) return "bg-danger";
+        if (percentage >= 70) return "bg-warning";
+        return "bg-success";
+    }
+
+    private string GetStatusBadgeClass()
+    {
+        if (Course == null) return "bg-secondary";
+        if (Course.IsFull) return "bg-danger";
+        if (Course.AvailableSeats <= 5) return "bg-warning";
+        return "bg-success";
+    }
+
+    private string GetStatusText()
+    {
+        if (Course == null) return "Unknown";
+        if (Course.IsFull) return "Full";
+        if (Course.AvailableSeats <= 5) return "Almost Full";
+        return "Open";
+    }
+
+    private string GetStatusIcon()
+    {
+        if (Course == null) return "bi-question-circle";
+        if (Course.IsFull) return "bi-x-circle";
+        if (Course.AvailableSeats <= 5) return "bi-exclamation-triangle";
+        return "bi-check-circle";
+    }
+
+    private string GetEnrollButtonClass()
+    {
+        if (Course == null || Course.IsFull) return "btn-secondary";
+        return "btn-primary";
+    }
+
+    private string GetEnrollButtonIcon()
+    {
+        if (Course == null || Course.IsFull) return "bi-ban";
+        return "bi-plus-circle";
+    }
+
+    private string GetEnrollButtonText()
+    {
+        if (Course == null) return "Unavailable";
+        if (Course.IsFull) return "Course Full";
+        return "Enroll Now";
+    }
+
+    private async Task OnEnroll()
+    {
+        if (Course != null)
+        {
+            await OnEnrollClick.InvokeAsync(Course);
+        }
+    }
+
+    private async Task OnEdit()
+    {
+        if (Course != null)
+        {
+            await OnEditClick.InvokeAsync(Course);
+        }
+    }
+
+    private async Task OnDelete()
+    {
+        if (Course != null)
+        {
+            await OnDeleteClick.InvokeAsync(Course);
+        }
+    }
+}

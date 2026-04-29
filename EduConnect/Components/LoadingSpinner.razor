@@ -1,0 +1,67 @@
+﻿@if (IsLoading)
+{
+    <div class="loading-overlay">
+        <div class="loading-container text-center">
+            <div class="spinner-border @GetSpinnerColor()"
+                 role="status"
+                 style="width: @Size; height: @Size;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            @if (!string.IsNullOrEmpty(Message))
+            {
+                <p class="mt-3 @GetMessageColor()">@Message</p>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string Message { get; set; } = "Loading...";
+    [Parameter] public string Size { get; set; } = "3rem";
+    [Parameter] public LoadingSpinnerType Type { get; set; } = LoadingSpinnerType.Primary;
+
+    private string GetSpinnerColor()
+    {
+        return Type switch
+        {
+            LoadingSpinnerType.Primary => "text-primary",
+            LoadingSpinnerType.Secondary => "text-secondary",
+            LoadingSpinnerType.Success => "text-success",
+            LoadingSpinnerType.Danger => "text-danger",
+            LoadingSpinnerType.Warning => "text-warning",
+            LoadingSpinnerType.Info => "text-info",
+            LoadingSpinnerType.Light => "text-light",
+            LoadingSpinnerType.Dark => "text-dark",
+            _ => "text-primary"
+        };
+    }
+
+    private string GetMessageColor()
+    {
+        return Type switch
+        {
+            LoadingSpinnerType.Primary => "text-primary",
+            LoadingSpinnerType.Secondary => "text-secondary",
+            LoadingSpinnerType.Success => "text-success",
+            LoadingSpinnerType.Danger => "text-danger",
+            LoadingSpinnerType.Warning => "text-warning",
+            LoadingSpinnerType.Info => "text-info",
+            LoadingSpinnerType.Light => "text-light",
+            LoadingSpinnerType.Dark => "text-dark",
+            _ => "text-primary"
+        };
+    }
+
+    public enum LoadingSpinnerType
+    {
+        Primary,
+        Secondary,
+        Success,
+        Danger,
+        Warning,
+        Info,
+        Light,
+        Dark
+    }
+}

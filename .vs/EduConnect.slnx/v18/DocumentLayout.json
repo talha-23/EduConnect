@@ -1,0 +1,185 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\TALHA\\Desktop\\EduConnect\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|c:\\users\\talha\\desktop\\educonnect\\educonnect\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|solutionrelative:educonnect\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|c:\\users\\talha\\desktop\\educonnect\\educonnect\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|solutionrelative:educonnect\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|c:\\users\\talha\\desktop\\educonnect\\educonnect\\exceptions\\coursefullexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|solutionrelative:educonnect\\exceptions\\coursefullexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|c:\\users\\talha\\desktop\\educonnect\\educonnect\\exceptions\\studenthasactiveenrollmentsexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|solutionrelative:educonnect\\exceptions\\studenthasactiveenrollmentsexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|c:\\users\\talha\\desktop\\educonnect\\educonnect\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|solutionrelative:educonnect\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|c:\\users\\talha\\desktop\\educonnect\\educonnect\\services\\interfaces\\ienrollmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|solutionrelative:educonnect\\services\\interfaces\\ienrollmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|c:\\users\\talha\\desktop\\educonnect\\educonnect\\services\\enrollmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|solutionrelative:educonnect\\services\\enrollmentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|c:\\users\\talha\\desktop\\educonnect\\educonnect\\models\\course.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|solutionrelative:educonnect\\models\\course.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|c:\\users\\talha\\desktop\\educonnect\\educonnect\\services\\courseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|solutionrelative:educonnect\\services\\courseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|c:\\users\\talha\\desktop\\educonnect\\educonnect\\services\\studentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C3D9B464-7C07-05B8-7878-C4B621018252}|EduConnect\\EduConnect.csproj|solutionrelative:educonnect\\services\\studentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "_Imports.razor",
+              "DocumentMoniker": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\_Imports.razor",
+              "RelativeDocumentMoniker": "EduConnect\\_Imports.razor",
+              "ToolTip": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\_Imports.razor",
+              "RelativeToolTip": "EduConnect\\_Imports.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-29T07:16:54.882Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "App.razor",
+              "DocumentMoniker": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\App.razor",
+              "RelativeDocumentMoniker": "EduConnect\\App.razor",
+              "ToolTip": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\App.razor",
+              "RelativeToolTip": "EduConnect\\App.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-29T07:16:53.904Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CourseFullException.cs",
+              "DocumentMoniker": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Exceptions\\CourseFullException.cs",
+              "RelativeDocumentMoniker": "EduConnect\\Exceptions\\CourseFullException.cs",
+              "ToolTip": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Exceptions\\CourseFullException.cs",
+              "RelativeToolTip": "EduConnect\\Exceptions\\CourseFullException.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T07:14:18.699Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "StudentHasActiveEnrollmentsException.cs",
+              "DocumentMoniker": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Exceptions\\StudentHasActiveEnrollmentsException.cs",
+              "RelativeDocumentMoniker": "EduConnect\\Exceptions\\StudentHasActiveEnrollmentsException.cs",
+              "ToolTip": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Exceptions\\StudentHasActiveEnrollmentsException.cs",
+              "RelativeToolTip": "EduConnect\\Exceptions\\StudentHasActiveEnrollmentsException.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T07:13:52.919Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Program.cs",
+              "RelativeDocumentMoniker": "EduConnect\\Program.cs",
+              "ToolTip": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Program.cs",
+              "RelativeToolTip": "EduConnect\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-29T06:00:15.565Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IEnrollmentService.cs",
+              "DocumentMoniker": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Services\\Interfaces\\IEnrollmentService.cs",
+              "RelativeDocumentMoniker": "EduConnect\\Services\\Interfaces\\IEnrollmentService.cs",
+              "ToolTip": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Services\\Interfaces\\IEnrollmentService.cs",
+              "RelativeToolTip": "EduConnect\\Services\\Interfaces\\IEnrollmentService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-24T06:36:51.605Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "EnrollmentService.cs",
+              "DocumentMoniker": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Services\\EnrollmentService.cs",
+              "RelativeDocumentMoniker": "EduConnect\\Services\\EnrollmentService.cs",
+              "ToolTip": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Services\\EnrollmentService.cs",
+              "RelativeToolTip": "EduConnect\\Services\\EnrollmentService.cs",
+              "ViewState": "AgIAAJEAAAAAAAAAAAAswLYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-24T06:31:53.208Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Course.cs",
+              "DocumentMoniker": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Models\\Course.cs",
+              "RelativeDocumentMoniker": "EduConnect\\Models\\Course.cs",
+              "ToolTip": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Models\\Course.cs",
+              "RelativeToolTip": "EduConnect\\Models\\Course.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAowCUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-24T06:18:58.515Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "CourseService.cs",
+              "DocumentMoniker": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Services\\CourseService.cs",
+              "RelativeDocumentMoniker": "EduConnect\\Services\\CourseService.cs",
+              "ToolTip": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Services\\CourseService.cs",
+              "RelativeToolTip": "EduConnect\\Services\\CourseService.cs",
+              "ViewState": "AgIAAKcAAAAAAAAAAAAwwMEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-24T06:15:56.23Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "StudentService.cs",
+              "DocumentMoniker": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Services\\StudentService.cs",
+              "RelativeDocumentMoniker": "EduConnect\\Services\\StudentService.cs",
+              "ToolTip": "C:\\Users\\TALHA\\Desktop\\EduConnect\\EduConnect\\Services\\StudentService.cs",
+              "RelativeToolTip": "EduConnect\\Services\\StudentService.cs",
+              "ViewState": "AgIAAKYAAAAAAAAAAAAgwMgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-24T06:54:25.362Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
