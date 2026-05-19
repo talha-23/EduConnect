@@ -4,28 +4,19 @@ namespace EduConnect.Services.Interfaces
 {
     public interface IGradeService
     {
-        // Grade management
         Task<GradeRecord> SubmitGradeAsync(GradeRecord grade);
         Task<List<GradeRecord>> SubmitMultipleGradesAsync(List<GradeRecord> grades);
         Task<GradeRecord?> UpdateGradeAsync(GradeRecord grade);
         Task<bool> DeleteGradeAsync(Guid gradeId);
-
-        // Grade retrieval
         Task<GradeRecord?> GetGradeByStudentAndCourseAsync(Guid studentId, Guid courseId);
         Task<List<GradeRecord>> GetGradesByStudentAsync(Guid studentId);
         Task<List<GradeRecord>> GetGradesByCourseAsync(Guid courseId);
         Task<List<GradeRecord>> GetGradesByFacultyAsync(Guid facultyId);
-
-        // Grade calculation
-        Task<double> CalculateStudentCGPAAsync(Guid studentId);
+        Task<double> CalculateStudentCGPAAsync(Guid studentId);  // Returns double
         Task<Dictionary<string, int>> GetGradeDistributionAsync(Guid courseId);
         Task<CourseStatistics> GetCourseStatisticsAsync(Guid courseId);
-
-        // Validation
         Task<bool> HasStudentReceivedGradeAsync(Guid studentId, Guid courseId);
         Task<bool> ValidateMarksAsync(double marks);
-
-        // Events
         event Action<GradeRecord> OnGradeSubmitted;
     }
 

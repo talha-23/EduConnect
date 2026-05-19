@@ -22,7 +22,7 @@
         <div class="card mb-4 bg-gradient">
             <div class="card-body text-center">
                 <h5 class="card-title">Current CGPA</h5>
-                <div class="display-1 @GetCgpaColorClass(currentCgpa)">
+                <div class="display-1 @GetCgpaColorClass(currentCgpaDouble)">
                     @currentCgpa.ToString("F2")
                 </div>
                 <p class="text-muted">out of 4.00</p>
@@ -81,9 +81,9 @@
                                 @foreach (var item in courseGradeViewModels)
                                 {
                                     <tr class="@(item.HasGrade ? item.GetCssClass() : "")">
-                                        <td>@item.CourseCode</td>
-                                        <td>@item.CourseTitle</td>
-                                        <td>@item.CreditHours</td>
+                                        <td>@item.CourseCode</td
+                                        <td>@item.CourseTitle</td
+                                        <td>@item.CreditHours</td
                                         <td>
                                             @if (item.HasGrade)
                                             {
@@ -93,7 +93,7 @@
                                             {
                                                 <span class="text-muted">Not graded</span>
                                             }
-                                        </td>
+                                        </td
                                         <td>
                                             @if (item.HasGrade)
                                             {
@@ -105,7 +105,7 @@
                                             {
                                                 <span class="badge bg-secondary">Pending</span>
                                             }
-                                        </td>
+                                        </td
                                         <td>
                                             @if (item.HasGrade)
                                             {
@@ -115,7 +115,7 @@
                                             {
                                                 <span class="text-muted">-</span>
                                             }
-                                        </td>
+                                        </td
                                         <td>
                                             @if (item.HasGrade)
                                             {
@@ -136,8 +136,8 @@
                                             {
                                                 <span class="badge bg-warning">In Progress</span>
                                             }
-                                        </td>
-                                        <td>@(item.HasGrade ? item.Remarks : "-")</td>
+                                        </td
+                                        <td>@(item.HasGrade ? item.Remarks : "-")</td
                                     </tr>
                                 }
                             </tbody>
@@ -145,10 +145,10 @@
                             {
                                 <tfoot class="table-secondary">
                                     <tr>
-                                        <td colspan="2"><strong>Total</strong></td>
-                                        <td><strong>@totalCredits</strong></td>
-                                        <td colspan="2"><strong>Weighted GPA:</strong></td>
-                                        <td colspan="3"><strong>@currentCgpa.ToString("F2")</strong></td>
+                                        <td colspan="2"><strong>Total</strong></td
+                                        <td><strong>@totalCredits</strong></td
+                                        <td colspan="2"><strong>Weighted GPA:</strong></td
+                                        <td colspan="3"><strong>@currentCgpa.ToString("F2")</strong></td
                                     </tr>
                                 </tfoot>
                             }
@@ -186,25 +186,25 @@
         <div class="card mt-3">
             <div class="card-body">
                 <h6>Academic Standing:</h6>
-                @if (currentCgpa >= 3.5)
+                @if (currentCgpaDouble >= 3.5)
                 {
                     <div class="alert alert-success">
                         <i class="bi bi-trophy"></i> <strong>Dean's List!</strong> Excellent academic performance!
                     </div>
                 }
-                else if (currentCgpa >= 3.0)
+                else if (currentCgpaDouble >= 3.0)
                 {
                     <div class="alert alert-info">
                         <i class="bi bi-star"></i> <strong>Good Standing.</strong> Keep up the good work!
                     </div>
                 }
-                else if (currentCgpa >= 2.0)
+                else if (currentCgpaDouble >= 2.0)
                 {
                     <div class="alert alert-warning">
                         <i class="bi bi-exclamation-triangle"></i> <strong>Satisfactory.</strong> You need to improve your grades.
                     </div>
                 }
-                else if (currentCgpa > 0)
+                else if (currentCgpaDouble > 0)
                 {
                     <div class="alert alert-danger">
                         <i class="bi bi-emoji-frown"></i> <strong>Academic Probation.</strong> Please consult your academic advisor.
@@ -220,6 +220,7 @@
     private List<CourseGradeViewModel> courseGradeViewModels = new();
     private bool isLoading = true;
     private double currentCgpa = 0;
+    private double currentCgpaDouble => (double)currentCgpa;
     private int totalCredits = 0;
     private int gradedCount = 0;
     private Guid? currentStudentId => AuthStateService.CurrentUser?.Id;
@@ -266,9 +267,9 @@
                     CourseTitle = course.Title,
                     CreditHours = course.CreditHours,
                     HasGrade = hasGrade,
-                    Marks = hasGrade ? grade!.Marks : 0,
+                    Marks = hasGrade ? (double)grade!.Marks : 0,
                     LetterGrade = hasGrade ? grade!.LetterGrade : "",
-                    GradePoints = hasGrade ? grade!.GradePoints : 0,
+                    GradePoints = hasGrade ? (double)grade!.GradePoints : 0,
                     Remarks = hasGrade ? grade!.Remarks : "",
                     GetCssClass = () => hasGrade ? grade!.GetCssClass() : ""
                 });
@@ -276,7 +277,6 @@
         }
         catch (Exception ex)
         {
-            // Handle error appropriately
             Console.WriteLine($"Error loading grades: {ex.Message}");
         }
         finally

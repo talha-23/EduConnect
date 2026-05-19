@@ -1,14 +1,22 @@
 is_global = true
 build_property.TargetFramework = net10.0
-build_property.TargetFrameworkIdentifier = .NETCoreApp
-build_property.TargetFrameworkVersion = v10.0
+build_property.TargetFramework = net10.0
+build_property.TargetPlatformMinVersion = 
 build_property.TargetPlatformMinVersion = 
 build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
 build_property.ProjectTypeGuids = 
 build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v10.0
 build_property.RootNamespace = EduConnect
 build_property.RootNamespace = EduConnect
 build_property.ProjectDir = C:\Users\TALHA\Desktop\EduConnect\EduConnect\
@@ -72,6 +80,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/Courses.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYWdlXENvdXJzZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/DatabaseTables.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5QYWdlXERhdGFiYXNlVGFibGVzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/TALHA/Desktop/EduConnect/EduConnect/Pages/AdminPage/EditStudent.razor]

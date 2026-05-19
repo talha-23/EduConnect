@@ -42,7 +42,7 @@
                             <tr>
                                 <th>CGPA</th>
                                 <td>
-                                    <span class="badge @GetCgpaBadgeClass(student.CGPA)" style="font-size: 1rem;">
+                                    <span class="badge @GetCgpaBadgeClass((double)student.CGPA)" style="font-size: 1rem;">
                                         @student.CGPA.ToString("F2")
                                     </span>
                                 </td>

@@ -12,5 +12,7 @@ namespace EduConnect.Services.Interfaces
         Task<bool> DeleteCourseAsync(Guid id);
         Task<bool> CanDeleteCourseAsync(Guid id);
         Task<int> GetTotalCoursesCountAsync();
+        Task IncrementEnrollmentCount(Guid courseId);
+        Task DecrementEnrollmentCount(Guid courseId);
     }
 }

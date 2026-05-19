@@ -1,0 +1,366 @@
+﻿@page "/admin/database-tables"
+@using EduConnect.Data
+@using EduConnect.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Context
+@inject NavigationManager Navigation
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-database"></i> Database Tables Viewer
+        </h2>
+        <button class="btn btn-primary" @onclick="RefreshData">
+            <i class="bi bi-arrow-repeat"></i> Refresh
+        </button>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Loading database tables...</p>
+        </div>
+    }
+    else
+    {
+        <!-- Table Selection Tabs -->
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <button class="nav-link @(selectedTable == "Users" ? "active" : "")"
+                        @onclick='() => SelectTable("Users")'>
+                    <i class="bi bi-people"></i> Users
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link @(selectedTable == "Students" ? "active" : "")"
+                        @onclick='() => SelectTable("Students")'>
+                    <i class="bi bi-mortarboard"></i> Students
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link @(selectedTable == "Faculties" ? "active" : "")"
+                        @onclick='() => SelectTable("Faculties")'>
+                    <i class="bi bi-person-badge"></i> Faculties
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link @(selectedTable == "Courses" ? "active" : "")"
+                        @onclick='() => SelectTable("Courses")'>
+                    <i class="bi bi-book"></i> Courses
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link @(selectedTable == "Enrollments" ? "active" : "")"
+                        @onclick='() => SelectTable("Enrollments")'>
+                    <i class="bi bi-journal-check"></i> Enrollments
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link @(selectedTable == "GradeRecords" ? "active" : "")"
+                        @onclick='() => SelectTable("GradeRecords")'>
+                    <i class="bi bi-trophy"></i> Grade Records
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link @(selectedTable == "Notifications" ? "active" : "")"
+                        @onclick='() => SelectTable("Notifications")'>
+                    <i class="bi bi-bell"></i> Notifications
+                </button>
+            </li>
+        </ul>
+
+        <!-- Table Information Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle"></i> Table: @selectedTable
+                    <span class="badge bg-light text-dark ms-2">@GetRowCount() rows</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                @foreach (var column in GetColumns())
+                                {
+                                    <th>@column</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in GetRows())
+                            {
+                                <tr>
+                                    @foreach (var value in row)
+                                    {
+                                        <td>@value</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Database Summary Cards -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h3>@totalUsers</h3>
+                        <p>Total Users</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3>@totalStudents</h3>
+                        <p>Total Students</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body text-center">
+                        <h3>@totalCourses</h3>
+                        <p>Total Courses</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h3>@totalEnrollments</h3>
+                        <p>Total Enrollments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string selectedTable = "Users";
+    private bool isLoading = true;
+    
+    // Data storage
+    private List<User> users = new();
+    private List<Student> students = new();
+    private List<Faculty> faculties = new();
+    private List<Course> courses = new();
+    private List<Enrollment> enrollments = new();
+    private List<GradeRecord> gradeRecords = new();
+    private List<Notification> notifications = new();
+    
+    // Counts
+    private int totalUsers = 0;
+    private int totalStudents = 0;
+    private int totalCourses = 0;
+    private int totalEnrollments = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAllData();
+    }
+
+    private async Task LoadAllData()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            // Load all tables
+            users = await Context.Users.ToListAsync();
+            students = await Context.Students.ToListAsync();
+            faculties = await Context.Faculties.ToListAsync();
+            courses = await Context.Courses.ToListAsync();
+            enrollments = await Context.Enrollments.ToListAsync();
+            gradeRecords = await Context.GradeRecords.ToListAsync();
+            notifications = await Context.Notifications.ToListAsync();
+
+            // Update counts
+            totalUsers = users.Count;
+            totalStudents = students.Count;
+            totalCourses = courses.Count;
+            totalEnrollments = enrollments.Count;
+            
+            Console.WriteLine($"Data loaded: {totalUsers} users, {totalStudents} students, {totalCourses} courses");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading data: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RefreshData()
+    {
+        await LoadAllData();
+        StateHasChanged();
+    }
+
+    private void SelectTable(string tableName)
+    {
+        selectedTable = tableName;
+        StateHasChanged();
+    }
+
+    private int GetRowCount()
+    {
+        return selectedTable switch
+        {
+            "Users" => users.Count,
+            "Students" => students.Count,
+            "Faculties" => faculties.Count,
+            "Courses" => courses.Count,
+            "Enrollments" => enrollments.Count,
+            "GradeRecords" => gradeRecords.Count,
+            "Notifications" => notifications.Count,
+            _ => 0
+        };
+    }
+
+    private List<string> GetColumns()
+    {
+        return selectedTable switch
+        {
+            "Users" => new List<string> { "ID", "Full Name", "Email", "Role", "Created At", "Active" },
+            "Students" => new List<string> { "ID", "Student ID", "Full Name", "Email", "Semester", "CGPA", "Department" },
+            "Faculties" => new List<string> { "ID", "Full Name", "Email", "Department", "Designation" },
+            "Courses" => new List<string> { "ID", "Code", "Title", "Credits", "Capacity", "Enrolled", "Instructor" },
+            "Enrollments" => new List<string> { "ID", "Student ID", "Course ID", "Enrollment Date", "Active" },
+            "GradeRecords" => new List<string> { "ID", "Student ID", "Course ID", "Marks", "Grade", "Grade Points", "Date" },
+            "Notifications" => new List<string> { "ID", "Title", "Message", "User Role", "Created", "Read", "Priority" },
+            _ => new List<string>()
+        };
+    }
+
+    private List<List<string>> GetRows()
+    {
+        var result = new List<List<string>>();
+        
+        switch (selectedTable)
+        {
+            case "Users":
+                foreach (var u in users)
+                {
+                    result.Add(new List<string>
+                    {
+                        u.Id.ToString().Substring(0, 8) + "...",
+                        u.FullName,
+                        u.Email,
+                        u.Role,
+                        u.CreatedAt.ToString("MM/dd/yyyy"),
+                        u.IsActive ? "Yes" : "No"
+                    });
+                }
+                break;
+            
+            case "Students":
+                foreach (var s in students)
+                {
+                    result.Add(new List<string>
+                    {
+                        s.Id.ToString().Substring(0, 8) + "...",
+                        s.StudentId,
+                        s.FullName,
+                        s.Email,
+                        $"Semester {s.Semester}",
+                        s.CGPA.ToString("F2"),
+                        s.Department
+                    });
+                }
+                break;
+            
+            case "Faculties":
+                foreach (var f in faculties)
+                {
+                    result.Add(new List<string>
+                    {
+                        f.Id.ToString().Substring(0, 8) + "...",
+                        f.FullName,
+                        f.Email,
+                        f.Department,
+                        f.Designation
+                    });
+                }
+                break;
+            
+            case "Courses":
+                foreach (var c in courses)
+                {
+                    result.Add(new List<string>
+                    {
+                        c.Id.ToString().Substring(0, 8) + "...",
+                        c.Code,
+                        c.Title,
+                        c.CreditHours.ToString(),
+                        c.MaxCapacity.ToString(),
+                        c.CurrentEnrollment.ToString(),
+                        c.Instructor
+                    });
+                }
+                break;
+            
+            case "Enrollments":
+                foreach (var e in enrollments)
+                {
+                    result.Add(new List<string>
+                    {
+                        e.Id.ToString().Substring(0, 8) + "...",
+                        e.StudentId.ToString().Substring(0, 8) + "...",
+                        e.CourseId.ToString().Substring(0, 8) + "...",
+                        e.EnrollmentDate.ToString("MM/dd/yyyy"),
+                        e.IsActive ? "Active" : "Dropped"
+                    });
+                }
+                break;
+            
+            case "GradeRecords":
+                foreach (var g in gradeRecords)
+                {
+                    result.Add(new List<string>
+                    {
+                        g.Id.ToString().Substring(0, 8) + "...",
+                        g.StudentId.ToString().Substring(0, 8) + "...",
+                        g.CourseId.ToString().Substring(0, 8) + "...",
+                        g.Marks.ToString(),
+                        g.LetterGrade,
+                        g.GradePoints.ToString("F2"),
+                        g.SubmissionDate.ToString("MM/dd/yyyy")
+                    });
+                }
+                break;
+            
+            case "Notifications":
+                foreach (var n in notifications)
+                {
+                    string shortMessage = n.Message.Length > 30 ? n.Message.Substring(0, 30) + "..." : n.Message;
+                    result.Add(new List<string>
+                    {
+                        n.Id.ToString().Substring(0, 8) + "...",
+                        n.Title,
+                        shortMessage,
+                        n.UserRole ?? "Specific User",
+                        n.CreatedAt.ToString("MM/dd/yyyy"),
+                        n.IsRead ? "Read" : "Unread",
+                        n.Priority
+                    });
+                }
+                break;
+        }
+        
+        return result;
+    }
+}

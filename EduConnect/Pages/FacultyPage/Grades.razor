@@ -249,7 +249,6 @@
             selectedCourse = await CourseService.GetCourseByIdAsync(selectedCourseId);
             Console.WriteLine($"Selected course: {selectedCourse?.Title}");
             
-            // Load enrolled students
             await LoadEnrolledStudents();
             await LoadExistingGrades();
         }
@@ -271,7 +270,6 @@
             isLoadingStudents = true;
             StateHasChanged();
             
-            // This is the CRITICAL method - it must return students
             enrolledStudents = await EnrollmentService.GetStudentsByCourseAsync(selectedCourseId);
             
             Console.WriteLine($"=== ENROLLED STUDENTS FOUND: {enrolledStudents.Count} ===");
@@ -326,6 +324,7 @@
         return gradeRecords.ContainsKey(studentId) ? gradeRecords[studentId] : new GradeRecord();
     }
     
+    // FIXED: Changed parameter from decimal to double
     private string GetLetterGradeFromMarks(double marks)
     {
         if (marks >= 85) return "A";
@@ -407,6 +406,7 @@
                         showError = true;
                         return;
                     }
+                    // FIXED: Remove cast - grade.Marks is already double
                     grade.LetterGrade = GetLetterGradeFromMarks(grade.Marks);
                     gradesToSubmit.Add(grade);
                 }

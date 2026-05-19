@@ -1,5 +1,10 @@
+
+
+
+using EduConnect.Data;
 using EduConnect.Services;
 using EduConnect.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,20 +12,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-// Register services for Module 1 (already exists)
-builder.Services.AddScoped<IAuthStateService, AuthStateService>();
+// Register Database Context
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=EduConnectDB;Trusted_Connection=True;TrustServerCertificate=true;"));
 
-// Register services for Module 2 - Fixed circular dependencies
-// Register services in order of dependency (least dependent first)
-builder.Services.AddScoped<ICourseService, CourseService>();
+// Register services
+builder.Services.AddScoped<IAuthStateService, AuthStateService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IGradeService, GradeService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// Configure pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");

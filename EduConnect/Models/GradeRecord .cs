@@ -8,17 +8,15 @@ namespace EduConnect.Models
         public Guid StudentId { get; set; }
         public Guid CourseId { get; set; }
         public Guid FacultyId { get; set; }
-        public double Marks { get; set; }
+        public double Marks { get; set; }  // Changed from decimal to double
         public string LetterGrade { get; set; } = string.Empty;
-        public double GradePoints { get; set; }
+        public double GradePoints { get; set; }  // Changed from decimal to double
         public DateTime SubmissionDate { get; set; }
         public string Remarks { get; set; } = string.Empty;
 
-        // Navigation properties
         public virtual Student? Student { get; set; }
         public virtual Course? Course { get; set; }
 
-        // Helper methods
         public void CalculateLetterGrade()
         {
             if (Marks >= 85)

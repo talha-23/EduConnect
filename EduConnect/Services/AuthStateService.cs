@@ -42,7 +42,7 @@ namespace EduConnect.Services
             // Create Student users with same IDs as in StudentService
             var student1 = new Student
             {
-                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), // Matches StudentService
+                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 FullName = "BABER AZAM",
                 Email = "baber@educonnect.com",
                 Password = "baber123",
@@ -54,7 +54,7 @@ namespace EduConnect.Services
 
             var student2 = new Student
             {
-                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), // Matches StudentService
+                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                 FullName = "ALLAH DITA",
                 Email = "dita@educonnect.com",
                 Password = "dita123",
@@ -66,13 +66,13 @@ namespace EduConnect.Services
 
             var student3 = new Student
             {
-                Id = Guid.Parse("33333333-3333-3333-3333-333333333333"), // Matches StudentService
+                Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
                 FullName = "MIA ASLAM",
                 Email = "aslam@educonnect.com",
                 Password = "aslam123",
                 StudentId = "STU003",
                 Semester = 5,
-                CGPA = 3.9,
+                CGPA = 3.9, 
                 Department = "Computer Science"
             };
             var student4 = new Student
@@ -104,7 +104,6 @@ namespace EduConnect.Services
             {
                 Console.WriteLine($"Attempting login with: {email}");
 
-                // Find user by email and password (case-insensitive)
                 var user = _users.FirstOrDefault(u =>
                     u.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
                     u.Password == password);
